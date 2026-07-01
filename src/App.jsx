@@ -142,6 +142,7 @@ export default function App() {
                 {currentUser.role === 'admin' ? (
                   <AdminDashboard
                     currentUser={currentUser}
+                    performanceData={performanceData}
                     employeesData={employeesData}
                     onRefresh={loadData}
                     onLogout={handleLogout}

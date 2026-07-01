@@ -206,3 +206,46 @@ export const updatePerformance = async (performanceData) => {
   }
   throw new Error('ไม่พบข้อมูลผลงานที่ต้องการแก้ไข (LocalStorage Mode)');
 };
+
+// เปลี่ยนรหัสผ่านของตัวเอง
+export const changePassword = async (employeeId, oldPassword, newPassword) => {
+  if (CONFIG.GOOGLE_SCRIPT_URL) {
+    try {
+      const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify({
+          action: 'changePassword',
+          employee_id: employeeId,
+          old_password: oldPassword,
+          new_password: newPassword
+        })
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        return data;
+      }
+      throw new Error(data.message || 'เกิดข้อผิดพลาดในการเปลี่ยนรหัสผ่าน');
+    } catch (error) {
+      console.error('GAS Change Password Error:', error);
+      if (CONFIG.GOOGLE_SCRIPT_URL) throw error;
+    }
+  }
+
+  // Local Storage Change Password
+  initializeLocalStorage();
+  const employees = JSON.parse(localStorage.getItem(LOCAL_EMPLOYEES_KEY));
+  const index = employees.findIndex(emp => emp.id === employeeId);
+  if (index === -1) {
+    throw new Error('ไม่พบข้อมูลพนักงานในระบบ');
+  }
+  if (employees[index].password !== oldPassword) {
+    throw new Error('รหัสผ่านเดิมไม่ถูกต้อง');
+  }
+  employees[index].password = newPassword;
+  localStorage.setItem(LOCAL_EMPLOYEES_KEY, JSON.stringify(employees));
+  return { status: 'success', message: 'เปลี่ยนรหัสผ่านสำเร็จ' };
+};
