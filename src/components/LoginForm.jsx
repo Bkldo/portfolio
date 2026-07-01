@@ -3,15 +3,15 @@ import { login } from '../utils/api';
 import { LogIn, ShieldAlert } from 'lucide-react';
 
 export default function LoginForm({ onLoginSuccess }) {
-  const [email, setEmail] = useState('');
+  const [citizenId, setCitizenId] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!email || !password) {
-      setError('กรุณากรอกอีเมลและรหัสผ่านให้ครบถ้วน');
+    if (!citizenId || !password) {
+      setError('กรุณากรอกเลขบัตรประจำตัวประชาชนและรหัสผ่านให้ครบถ้วน');
       return;
     }
 
@@ -19,7 +19,7 @@ export default function LoginForm({ onLoginSuccess }) {
     setError('');
 
     try {
-      const user = await login(email, password);
+      const user = await login(citizenId, password);
       onLoginSuccess(user);
     } catch (err) {
       setError(err.message || 'เกิดข้อผิดพลาดในการเข้าสู่ระบบ');
@@ -60,14 +60,20 @@ export default function LoginForm({ onLoginSuccess }) {
 
         <form onSubmit={handleSubmit}>
           <div className="form-group">
-            <label className="form-label">อีเมลผู้ใช้งาน (Email)</label>
+            <label className="form-label">เลขบัตรประจำตัวประชาชน</label>
             <input
-              type="email"
+              type="text"
               className="form-input"
-              placeholder="example@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="เช่น 1234567890123"
+              value={citizenId}
+              onChange={(e) => {
+                // อนุญาตเฉพาะตัวเลขและจำกัดความยาว 13 หลัก
+                const val = e.target.value.replace(/\D/g, '').slice(0, 13);
+                setCitizenId(val);
+              }}
               disabled={loading}
+              maxLength={13}
+              inputMode="numeric"
               required
             />
           </div>
@@ -94,6 +100,21 @@ export default function LoginForm({ onLoginSuccess }) {
             {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
           </button>
         </form>
+
+        <div style={{ marginTop: '24px', fontSize: '12px', color: '#94a3b8' }}>
+          <p>บัญชีทดสอบในระบบจำลอง (LocalStorage):</p>
+          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
+            <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+              <strong>Admin:</strong> 1999999999991 / password123
+            </span>
+            <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+              <strong>CEO:</strong> 1100100100001 / password123
+            </span>
+            <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
+              <strong>พนักงาน:</strong> 1100200200002 / password123
+            </span>
+          </div>
+        </div>
       </div>
     </div>
   );

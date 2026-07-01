@@ -22,14 +22,14 @@ function setupSheets() {
   var empSheet = ss.getSheetByName('Employees');
   if (!empSheet) {
     empSheet = ss.insertSheet('Employees');
-    empSheet.appendRow(['id', 'name', 'position', 'department', 'email', 'password', 'role', 'image_url']);
+    empSheet.appendRow(['id', 'name', 'position', 'department', 'citizen_id', 'password', 'role', 'image_url']);
     
     // ใส่ข้อมูลผู้ใช้ระดับ admin, ผู้บริหาร และพนักงานจำลองตัวอย่าง
-    empSheet.appendRow(['ADM001', 'สมบูรณ์ ระบบดี', 'System Administrator', 'ไอที', 'admin@company.com', '123456', 'admin', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150']);
-    empSheet.appendRow(['EMP001', 'ผู้บริหาร สูงสุด', 'ประธานเจ้าหน้าที่บริหาร (CEO)', 'ผู้บริหาร', 'ceo@company.com', '123456', 'executive', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150']);
-    empSheet.appendRow(['EMP002', 'สมชาย รักดี', 'Software Engineer', 'ไอที', 'somchai@company.com', '123456', 'employee', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150']);
-    empSheet.appendRow(['EMP003', 'สมศรี สวยงาม', 'Marketing Manager', 'การตลาด', 'somsri@company.com', '123456', 'employee', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150']);
-    empSheet.appendRow(['EMP004', 'วันชัย ทรงพลัง', 'HR Specialist', 'บุคคล', 'wanchai@company.com', '123456', 'employee', 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150']);
+    empSheet.appendRow(['ADM001', 'สมบูรณ์ ระบบดี', 'System Administrator', 'ไอที', '1999999999991', '123456', 'admin', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150']);
+    empSheet.appendRow(['EMP001', 'ผู้บริหาร สูงสุด', 'ประธานเจ้าหน้าที่บริหาร (CEO)', 'ผู้บริหาร', '1100100100001', '123456', 'executive', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150']);
+    empSheet.appendRow(['EMP002', 'สมชาย รักดี', 'Software Engineer', 'ไอที', '1100200200002', '123456', 'employee', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150']);
+    empSheet.appendRow(['EMP003', 'สมศรี สวยงาม', 'Marketing Manager', 'การตลาด', '1100300300003', '123456', 'employee', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150']);
+    empSheet.appendRow(['EMP004', 'วันชัย ทรงพลัง', 'HR Specialist', 'บุคคล', '1100400400004', '123456', 'employee', 'https://images.unsplash.com/photo-1570295999919-56ceb5ecca61?w=150']);
   }
   
   // 2. ตาราง Performance (ผลงานรายเดือน)
@@ -108,12 +108,12 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     
     if (action === 'login') {
-      var email = postData.email;
+      var citizen_id = postData.citizen_id;
       var password = postData.password;
       
       var employees = getSheetData(ss, 'Employees');
       var user = employees.find(function(emp) {
-        return emp.email === email && emp.password.toString() === password.toString();
+        return emp.citizen_id.toString().trim() === citizen_id.toString().trim() && emp.password.toString() === password.toString();
       });
       
       if (user) {
@@ -122,26 +122,26 @@ function doPost(e) {
         delete userData.password;
         result = { status: 'success', user: userData };
       } else {
-        result = { status: 'error', message: 'อีเมลหรือรหัสผ่านไม่ถูกต้อง' };
+        result = { status: 'error', message: 'เลขบัตรประชาชนหรือรหัสผ่านไม่ถูกต้อง' };
       }
       
     } else if (action === 'addEmployee') {
       var empSheet = ss.getSheetByName('Employees');
-      var newEmp = postData.data; // { id, name, position, department, email, password, role, image_url }
+      var newEmp = postData.data; // { id, name, position, department, citizen_id, password, role, image_url }
       
       // ตรวจสอบข้อมูลซ้ำ
       var employees = getSheetData(ss, 'Employees');
-      var exists = employees.some(function(emp) { return emp.email === newEmp.email || emp.id === newEmp.id; });
+      var exists = employees.some(function(emp) { return emp.citizen_id.toString() === newEmp.citizen_id.toString() || emp.id === newEmp.id; });
       
       if (exists) {
-        result = { status: 'error', message: 'รหัสพนักงานหรืออีเมลนี้มีอยู่ในระบบแล้ว' };
+        result = { status: 'error', message: 'รหัสพนักงานหรือเลขบัตรประชาชนนี้มีอยู่ในระบบแล้ว' };
       } else {
         empSheet.appendRow([
           newEmp.id,
           newEmp.name,
           newEmp.position,
           newEmp.department,
-          newEmp.email,
+          newEmp.citizen_id,
           newEmp.password || '123456',
           newEmp.role || 'employee',
           newEmp.image_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150'

@@ -8,7 +8,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
   const [name, setName] = useState('');
   const [position, setPosition] = useState('');
   const [department, setDepartment] = useState(CONFIG.DEPARTMENTS[1]); // ค่าตั้งต้นคือไอที
-  const [email, setEmail] = useState('');
+  const [citizenId, setCitizenId] = useState('');
   const [password, setPassword] = useState('123456'); // รหัสตั้งต้นใช้งานง่าย
   const [role, setRole] = useState('employee');
   const [imageUrl, setImageUrl] = useState('');
@@ -21,8 +21,13 @@ export default function EmployeeProfileForm({ onSuccess }) {
     setError('');
     setSuccessMsg('');
 
-    if (!empId.trim() || !name.trim() || !position.trim() || !email.trim()) {
-      setError('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (รหัสพนักงาน, ชื่อ, ตำแหน่ง, อีเมล)');
+    if (!empId.trim() || !name.trim() || !position.trim() || !citizenId.trim()) {
+      setError('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (รหัสพนักงาน, ชื่อ, ตำแหน่ง, เลขบัตรประชาชน)');
+      return;
+    }
+
+    if (citizenId.trim().length !== 13) {
+      setError('เลขบัตรประจำตัวประชาชนต้องมี 13 หลัก');
       return;
     }
 
@@ -33,7 +38,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
       name: name.trim(),
       position: position.trim(),
       department,
-      email: email.trim(),
+      citizen_id: citizenId.trim(),
       password: password.trim(),
       role,
       image_url: imageUrl.trim() || `https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150` // รูปคนดีฟอลต์
@@ -46,7 +51,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
       setEmpId('');
       setName('');
       setPosition('');
-      setEmail('');
+      setCitizenId('');
       setPassword('123456');
       setImageUrl('');
       
@@ -157,13 +162,18 @@ export default function EmployeeProfileForm({ onSuccess }) {
 
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           <div className="form-group">
-            <label className="form-label">อีเมลในการล็อกอิน *</label>
+            <label className="form-label">เลขบัตรประจำตัวประชาชน (สำหรับล็อกอิน) *</label>
             <input
-              type="email"
+              type="text"
               className="form-input"
-              placeholder="somnuk@company.com"
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              placeholder="เช่น 1234567890123"
+              value={citizenId}
+              onChange={(e) => {
+                const val = e.target.value.replace(/\D/g, '').slice(0, 13);
+                setCitizenId(val);
+              }}
+              maxLength={13}
+              inputMode="numeric"
               required
             />
           </div>

@@ -22,7 +22,7 @@ export default function AdminDashboard({ currentUser, employeesData, onRefresh, 
   const filteredEmployees = employeesData.filter(e => {
     const matchSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         e.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        e.email.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        (e.citizen_id || '').includes(searchQuery) ||
                         e.position.toLowerCase().includes(searchQuery.toLowerCase());
     const matchDept = selectedDept === 'ทั้งหมด' || e.department === selectedDept;
     return matchSearch && matchDept;
@@ -143,7 +143,7 @@ export default function AdminDashboard({ currentUser, employeesData, onRefresh, 
                   <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>รหัส (ID)</th>
                   <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>ตำแหน่ง</th>
                   <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>สังกัด / ฝ่าย</th>
-                  <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>อีเมลล็อกอิน</th>
+                  <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>เลขบัตรประชาชน (สำหรับล็อกอิน)</th>
                   <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>ระดับสิทธิ์ (Role)</th>
                 </tr>
               </thead>
@@ -170,7 +170,7 @@ export default function AdminDashboard({ currentUser, employeesData, onRefresh, 
                         {emp.department}
                       </span>
                     </td>
-                    <td style={{ padding: '12px', color: 'var(--text-muted)' }}>{emp.email}</td>
+                    <td style={{ padding: '12px', color: 'var(--text-muted)', fontFamily: 'monospace', letterSpacing: '1px' }}>{emp.citizen_id || '-'}</td>
                     <td style={{ padding: '12px' }}>
                       <span style={{
                         padding: '4px 10px',

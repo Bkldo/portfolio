@@ -43,7 +43,7 @@ export const getInitialData = async () => {
 };
 
 // จัดการเข้าสู่ระบบ
-export const login = async (email, password) => {
+export const login = async (citizenId, password) => {
   if (CONFIG.GOOGLE_SCRIPT_URL) {
     try {
       const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
@@ -54,7 +54,7 @@ export const login = async (email, password) => {
         },
         body: JSON.stringify({
           action: 'login',
-          email,
+          citizen_id: citizenId,
           password
         })
       });
@@ -62,7 +62,7 @@ export const login = async (email, password) => {
       if (data.status === 'success') {
         return data.user;
       }
-      throw new Error(data.message || 'อีเมลหรือรหัสผ่านไม่ถูกต้อง');
+      throw new Error(data.message || 'เลขบัตรประชาชนหรือรหัสผ่านไม่ถูกต้อง');
     } catch (error) {
       console.error('GAS Login Error:', error);
       if (CONFIG.GOOGLE_SCRIPT_URL) {
@@ -74,13 +74,13 @@ export const login = async (email, password) => {
   // Local Storage Login
   initializeLocalStorage();
   const employees = JSON.parse(localStorage.getItem(LOCAL_EMPLOYEES_KEY));
-  const user = employees.find(emp => emp.email === email && emp.password === password);
+  const user = employees.find(emp => String(emp.citizen_id || '').trim() === String(citizenId || '').trim() && emp.password === password);
   if (user) {
     const userData = { ...user };
     delete userData.password;
     return userData;
   }
-  throw new Error('อีเมลหรือรหัสผ่านไม่ถูกต้อง (LocalStorage Mode)');
+  throw new Error('เลขบัตรประชาชนหรือรหัสผ่านไม่ถูกต้อง (LocalStorage Mode)');
 };
 
 // ลงทะเบียนพนักงานใหม่
@@ -112,9 +112,9 @@ export const addEmployee = async (employeeData) => {
   // Local Storage Add
   initializeLocalStorage();
   const employees = JSON.parse(localStorage.getItem(LOCAL_EMPLOYEES_KEY));
-  const exists = employees.some(emp => emp.email === employeeData.email || emp.id === employeeData.id);
+  const exists = employees.some(emp => emp.citizen_id === employeeData.citizen_id || emp.id === employeeData.id);
   if (exists) {
-    throw new Error('รหัสพนักงานหรืออีเมลนี้มีอยู่ในระบบแล้ว (LocalStorage Mode)');
+    throw new Error('รหัสพนักงานหรือเลขบัตรประชาชนนี้มีอยู่ในระบบแล้ว (LocalStorage Mode)');
   }
   employees.push({
     ...employeeData,

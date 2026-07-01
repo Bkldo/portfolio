@@ -526,8 +526,8 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                           <div className="meta-value">ฝ่าย{selectedEmployee.department}</div>
                         </div>
                         <div className="meta-item">
-                          <div className="meta-label">อีเมลติดต่อ</div>
-                          <div className="meta-value">{selectedEmployee.email}</div>
+                          <div className="meta-label">เลขบัตรประชาชน</div>
+                          <div className="meta-value" style={{ fontFamily: 'monospace', letterSpacing: '1px' }}>{selectedEmployee.citizen_id || '-'}</div>
                         </div>
                       </div>
                     </div>

@@ -6,7 +6,7 @@ export const mockEmployees = [
     name: "สมบูรณ์ ระบบดี",
     position: "System Administrator",
     department: "ไอที",
-    email: "admin@company.com",
+    citizen_id: "1999999999991",
     password: "password123",
     role: "admin",
     image_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
@@ -16,7 +16,7 @@ export const mockEmployees = [
     name: "ดร.มานพ แสนสุข",
     position: "ประธานเจ้าหน้าที่บริหาร (CEO)",
     department: "ผู้บริหาร",
-    email: "ceo@company.com",
+    citizen_id: "1100100100001",
     password: "password123",
     role: "executive",
     image_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150"
@@ -26,7 +26,7 @@ export const mockEmployees = [
     name: "สมชาย รักดี",
     position: "Software Developer Senior",
     department: "ไอที",
-    email: "somchai@company.com",
+    citizen_id: "1100200200002",
     password: "password123",
     role: "employee",
     image_url: "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"
@@ -36,7 +36,7 @@ export const mockEmployees = [
     name: "พัชรา ศิริกุล",
     position: "Digital Marketer",
     department: "การตลาด",
-    email: "patchara@company.com",
+    citizen_id: "1100300300003",
     password: "password123",
     role: "employee",
     image_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150"
@@ -46,7 +46,7 @@ export const mockEmployees = [
     name: "ธนาวุฒิ ยอดงาม",
     position: "Senior Accountant",
     department: "บัญชี",
-    email: "thanawut@company.com",
+    citizen_id: "1100400400004",
     password: "password123",
     role: "employee",
     image_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
@@ -56,7 +56,7 @@ export const mockEmployees = [
     name: "นภาพร ชัยชนะ",
     position: "HR Officer",
     department: "บุคคล",
-    email: "napaporn@company.com",
+    citizen_id: "1100500500005",
     password: "password123",
     role: "employee",
     image_url: "https://images.unsplash.com/photo-1573496359142-b8d87734a5a2?w=150"
@@ -66,7 +66,7 @@ export const mockEmployees = [
     name: "นรากร ลาภมาก",
     position: "Sales Representative",
     department: "ขาย",
-    email: "narakorn@company.com",
+    citizen_id: "1100600600006",
     password: "password123",
     role: "employee",
     image_url: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?w=150"
@@ -92,135 +92,109 @@ export const mockPerformance = [
     employee_id: "EMP003",
     year: "2026",
     month: "พฤษภาคม",
-    title: "จัดทำแคมเปญส่งเสริมการขายช่วงกลางปี Mid-Year Sale 6.6",
-    details: "ออกแบบป้ายแบนเนอร์โฆษณา จัดวางงบประมาณ Facebook Ads แคมเปญสร้างการรับรู้สำหรับสินค้าใหม่ ยอดเข้าชมเว็บไซต์ทะลุเป้าหมาย 120%",
+    title: "แคมเปญโซเชียลมีเดีย Q2",
+    details: "เพิ่มยอด Follower ได้ 20% ผ่านช่องทาง Instagram, Facebook และ TikTok มีเนื้อหาที่ไวรัลถึง 3 ชิ้น",
     completion_rate: "100",
     status: "Done",
-    ref_link: "https://facebook.com/midyearsale66",
-    timestamp: "2026-05-30T10:30:00Z"
+    ref_link: "https://analytics.google.com/dashboard",
+    timestamp: "2026-05-28T14:00:00Z"
   },
   {
     id: "PERF_003",
     employee_id: "EMP004",
     year: "2026",
     month: "พฤษภาคม",
-    title: "ปิดงบการเงินไตรมาสที่ 1 ประจำปี 2569",
-    details: "ตรวจสอบเอกสารใบกำกับภาษี ใบเสร็จรับเงิน กระทบยอดเงินฝากธนาคาร และสรุปส่งงบดุลให้กับกรมพัฒนาธุรกิจการค้าทันตามเวลา",
+    title: "ปิดงบการเงินไตรมาส 1/2026",
+    details: "ตรวจสอบรายรับรายจ่ายทุกรายการ ทำรายงานสรุปงบเสนอผู้บริหาร และส่งข้อมูลให้สำนักงานบัญชีเรียบร้อย",
     completion_rate: "100",
     status: "Done",
     ref_link: "",
-    timestamp: "2026-05-29T16:00:00Z"
+    timestamp: "2026-05-25T09:00:00Z"
   },
+  // เดือน มิถุนายน
   {
     id: "PERF_004",
-    employee_id: "EMP005",
+    employee_id: "EMP002",
     year: "2026",
-    month: "พฤษภาคม",
-    title: "จัดอบรมพัฒนาทักษะพนักงานประจำปี (Soft Skills & Design Thinking)",
-    details: "ติดต่อวิทยากรภายนอก ดำเนินการจองสถานที่ จัดทำแบบประเมินผลการฝึกอบรม ค่าความพึงพอใจโดยรวมเฉลี่ย 4.85 จาก 5 คะแนน",
+    month: "มิถุนายน",
+    title: "ย้ายระบบขึ้น Cloud Infrastructure",
+    details: "ย้ายเซิร์ฟเวอร์จาก On-Premise ไป AWS ลดค่าใช้จ่ายรายเดือน 30% และเพิ่ม Uptime เป็น 99.9%",
     completion_rate: "100",
     status: "Done",
-    ref_link: "",
-    timestamp: "2026-05-28T09:00:00Z"
+    ref_link: "https://aws.amazon.com/console",
+    timestamp: "2026-06-20T10:00:00Z"
   },
   {
     id: "PERF_005",
-    employee_id: "EMP006",
-    year: "2026",
-    month: "พฤษภาคม",
-    title: "ขยายฐานลูกค้ากลุ่มโรงพยาบาลและสาธารณสุข",
-    details: "เข้าพบคอนแทคติดต่อโรงพยาบาลรัฐขนาดใหญ่ 3 แห่ง นำเสนอโซลูชันระบบไอทีของบริษัท และปิดยอดขายได้รวมมูลค่ากว่า 1.2 ล้านบาท",
-    completion_rate: "100",
-    status: "Done",
-    ref_link: "",
-    timestamp: "2026-05-27T11:00:00Z"
-  },
-
-  // เดือน มิถุนายน
-  {
-    id: "PERF_006",
-    employee_id: "EMP002",
-    year: "2026",
-    month: "มิถุนายน",
-    title: "ปรับปรุงประสิทธิภาพ Database และความเร็วเว็บไซต์หลังบ้าน",
-    details: "เขียน Query Optimization ในฐานข้อมูลหลัก เพิ่ม Index ทำระบบแคชหน้าหลัก ลดการตอบสนองของเซิร์ฟเวอร์เฉลี่ยลงจาก 1.5 วินาที เหลือ 0.3 วินาที",
-    completion_rate: "100",
-    status: "Done",
-    ref_link: "",
-    timestamp: "2026-06-29T10:00:00Z"
-  },
-  {
-    id: "PERF_007",
     employee_id: "EMP003",
     year: "2026",
     month: "มิถุนายน",
-    title: "วิเคราะห์พฤติกรรมกลุ่มลูกค้าและวิจัยตลาดคู่แข่ง (Market Analysis)",
-    details: "ทำแบบสอบถามออนไลน์และวิจัยคู่แข่ง 3 อันดับแรก เพื่อนำมาพัฒนาคุณสมบัติผลิตภัณฑ์ใหม่ ค้นพบช่องว่างทางการขายในกลุ่มผู้สูงอายุ",
-    completion_rate: "90",
+    title: "จัดงาน Product Launch Event",
+    details: "วางแผนและจัดงานเปิดตัวสินค้าใหม่ มีผู้เข้าร่วม 500 คน สร้าง Lead ใหม่ได้ 150 ราย",
+    completion_rate: "100",
     status: "Done",
-    ref_link: "https://drive.google.com/report1",
-    timestamp: "2026-06-30T14:00:00Z"
-  },
-  {
-    id: "PERF_008",
-    employee_id: "EMP004",
-    year: "2026",
-    month: "มิถุนายน",
-    title: "ย้ายการลงบันทึกบัญชีสู่ระบบคลาวด์โปรแกรม Express Online",
-    details: "ศึกษาและนำเข้าฐานข้อมูลบัญชีเดิมเข้าสู่โครงสร้างโปรแกรมใหม่เพื่อการทำงานจากที่ใดก็ได้ ปัจจุบันย้ายข้อมูลสำเร็จแล้ว 80% ติดปัญหาตรวจยอดกระทบจากปีก่อนหน้าเล็กน้อย",
-    completion_rate: "80",
-    status: "In Progress",
     ref_link: "",
-    timestamp: "2026-06-30T11:00:00Z"
+    timestamp: "2026-06-15T11:00:00Z"
   },
   {
-    id: "PERF_009",
+    id: "PERF_006",
     employee_id: "EMP005",
     year: "2026",
     month: "มิถุนายน",
-    title: "ทบทวนโครงสร้างการประเมินผลงานครึ่งปีแรก (Mid-Year Appraisal)",
-    details: "จัดทำแบบฟอร์มการประเมิน ส่งต่อให้ผู้จัดการแต่ละฝ่ายเพื่อประเมินลูกทีม รวบรวมและสรุปผลคะแนนเบื้องต้น มีสถิติพนักงานประเมินแล้ว 95%",
-    completion_rate: "95",
-    status: "In Progress",
+    title: "โครงการ Employee Engagement Survey",
+    details: "ออกแบบแบบสำรวจความพึงพอใจพนักงาน เก็บข้อมูลครบ 95% ของพนักงานทั้งหมด วิเคราะห์ผลและเสนอแผนปรับปรุง",
+    completion_rate: "100",
+    status: "Done",
     ref_link: "",
-    timestamp: "2026-06-28T09:30:00Z"
+    timestamp: "2026-06-10T13:00:00Z"
   },
   {
-    id: "PERF_010",
+    id: "PERF_007",
     employee_id: "EMP006",
     year: "2026",
     month: "มิถุนายน",
-    title: "ดูแลยอดขายและบริการลูกค้ารายเดิมแบบสัญญารายปี",
-    details: "เจรจาต่อสัญญาบริการรักษาระบบไอทีรายปี (MA) สำหรับลูกค้ารายเดิม 4 บริษัท ทำสัญญาใหม่สำเร็จ แต่ล่าช้ากว่ากำหนดเดิมเนื่องจากขั้นตอนกฎหมายฝั่งลูกค้า",
-    completion_rate: "60",
-    status: "Delayed",
+    title: "ขยายฐานลูกค้ากลุ่ม SME",
+    details: "ติดต่อลูกค้าใหม่ 30 ราย ปิดการขายสำเร็จ 12 ราย คิดเป็นรายได้เพิ่ม 850,000 บาท",
+    completion_rate: "90",
+    status: "In Progress",
     ref_link: "",
-    timestamp: "2026-06-29T15:00:00Z"
+    timestamp: "2026-06-18T15:00:00Z"
   },
-
-  // เดือน กรกฎาคม (กำลังดำเนินการ)
+  // เดือน กรกฎาคม
   {
-    id: "PERF_011",
+    id: "PERF_008",
     employee_id: "EMP002",
     year: "2026",
     month: "กรกฎาคม",
-    title: "พัฒนาระบบ Portfolio พนักงาน (โปรเจกต์ปัจจุบัน)",
-    details: "ออกแบบฐานข้อมูลใน Google Sheet เขียนสคริปต์เชื่อมต่อ GAS และพัฒนาหน้า UI ด้วย React สำหรับรายงานผู้บริหาร",
-    completion_rate: "40",
+    title: "พัฒนาระบบ Portfolio Dashboard",
+    details: "สร้างระบบเว็บแอปพลิเคชันเพื่อบันทึกผลงานรายเดือนของพนักงาน เชื่อมต่อ Google Sheets API พร้อม Deploy บน GitHub Pages",
+    completion_rate: "80",
     status: "In Progress",
-    ref_link: "",
+    ref_link: "https://github.com/portfolio-dashboard",
     timestamp: "2026-07-01T10:00:00Z"
   },
   {
-    id: "PERF_012",
-    employee_id: "EMP003",
+    id: "PERF_009",
+    employee_id: "EMP004",
     year: "2026",
     month: "กรกฎาคม",
-    title: "วางแผนโฆษณาสำหรับไตรมาสที่ 3 (Q3 Marketing Plan)",
-    details: "จัดเตรียมงบโฆษณาสำหรับเปิดตัวสินค้าช่วงสิงหาคม ประสานงานกับฝ่ายสร้างสรรค์ในการถ่ายทำสื่อวิดีโอแอด",
-    completion_rate: "20",
+    title: "ตรวจสอบภาษีครึ่งปี 2026",
+    details: "รวบรวมเอกสารและคำนวณภาษีหัก ณ ที่จ่ายครึ่งปีแรก เตรียมยื่นแบบ ภ.ง.ด. 51",
+    completion_rate: "60",
     status: "In Progress",
     ref_link: "",
     timestamp: "2026-07-01T09:00:00Z"
+  },
+  {
+    id: "PERF_010",
+    employee_id: "EMP005",
+    year: "2026",
+    month: "กรกฎาคม",
+    title: "จัดอบรม Soft Skills ให้พนักงานใหม่",
+    details: "จัดเตรียมหลักสูตรอบรมทักษะการสื่อสารและการทำงานเป็นทีม สำหรับพนักงานใหม่ 8 คนที่เข้าร่วมเมื่อ Q2",
+    completion_rate: "40",
+    status: "In Progress",
+    ref_link: "",
+    timestamp: "2026-07-01T14:00:00Z"
   }
 ];
