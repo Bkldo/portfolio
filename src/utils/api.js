@@ -55,6 +55,7 @@ export const login = async (citizenId, password) => {
         body: JSON.stringify({
           action: 'login',
           citizen_id: citizenId,
+          email: citizenId, // ส่ง email ไปด้วยเพื่อป้องกันปัญหา GAS เวอร์ชันเดิมที่ยังเช็คตัวแปร email อยู่ (undefined === undefined)
           password
         })
       });
@@ -74,7 +75,10 @@ export const login = async (citizenId, password) => {
   // Local Storage Login
   initializeLocalStorage();
   const employees = JSON.parse(localStorage.getItem(LOCAL_EMPLOYEES_KEY));
-  const user = employees.find(emp => String(emp.citizen_id || '').trim() === String(citizenId || '').trim() && emp.password === password);
+  const user = employees.find(emp => {
+    const empId = emp.citizen_id !== undefined ? emp.citizen_id : emp.email;
+    return empId !== undefined && empId !== null && String(empId).trim() === String(citizenId || '').trim() && String(emp.password) === String(password);
+  });
   if (user) {
     const userData = { ...user };
     delete userData.password;

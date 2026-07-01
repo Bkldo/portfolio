@@ -2,15 +2,17 @@ import React, { useState } from 'react';
 import {
   Users, BarChart3, TrendingUp, ShieldAlert,
   Search, FolderKanban, FileText, CheckCircle2,
-  Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight
+  Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight, KeyRound
 } from 'lucide-react';
 import { CONFIG } from '../config';
+import ChangePasswordModal from './ChangePasswordModal';
 
 export default function ExecutiveDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [activeSubTab, setActiveSubTab] = useState('overall'); // overall, department, individual
   const [selectedDept, setSelectedDept] = useState(CONFIG.DEPARTMENTS[1]); // ไอที เป็นดีฟอลต์
   const [selectedEmpId, setSelectedEmpId] = useState(employeesData[1]?.id || ''); // พนักงานคนแรกที่ไม่ใช่ CEO เป็นดีฟอลต์
   const [searchQuery, setSearchQuery] = useState('');
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   // --- การคำนวณและเตรียมข้อมูลสำหรับแต่ละส่วน ---
 
@@ -101,6 +103,10 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn btn-secondary" onClick={() => setShowPasswordModal(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <KeyRound size={16} style={{ color: 'var(--primary)' }} />
+            เปลี่ยนรหัสผ่าน
+          </button>
           <button className="btn btn-secondary" onClick={onLogout} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <LogOut size={16} />
             ออกจากระบบ
@@ -638,6 +644,13 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           </div>
         </div>
       )}
+
+      <ChangePasswordModal
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        currentUser={currentUser}
+        onSuccess={onRefresh}
+      />
     </div>
   );
 }

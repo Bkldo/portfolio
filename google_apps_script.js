@@ -108,12 +108,13 @@ function doPost(e) {
     var ss = SpreadsheetApp.getActiveSpreadsheet();
     
     if (action === 'login') {
-      var citizen_id = postData.citizen_id;
+      var citizen_id = postData.citizen_id || postData.email;
       var password = postData.password;
       
       var employees = getSheetData(ss, 'Employees');
       var user = employees.find(function(emp) {
-        return emp.citizen_id.toString().trim() === citizen_id.toString().trim() && emp.password.toString() === password.toString();
+        var empId = emp.citizen_id !== undefined ? emp.citizen_id : emp.email;
+        return empId !== undefined && empId !== null && empId.toString().trim() === citizen_id.toString().trim() && emp.password !== undefined && emp.password.toString() === password.toString();
       });
       
       if (user) {
@@ -197,6 +198,33 @@ function doPost(e) {
         result = { status: 'success', message: 'แก้ไขข้อมูลผลงานสำเร็จ' };
       } else {
         result = { status: 'error', message: 'ไม่พบรหัสผลงานที่ต้องการแก้ไข' };
+      }
+      
+    } else if (action === 'changePassword') {
+      var empSheet = ss.getSheetByName('Employees');
+      var empId = postData.employee_id;
+      var oldPass = postData.old_password;
+      var newPass = postData.new_password;
+      
+      var data = empSheet.getDataRange().getValues();
+      var foundIdx = -1;
+      
+      for (var i = 1; i < data.length; i++) {
+        if (data[i][0].toString().trim() === empId.toString().trim()) {
+          foundIdx = i + 1; // 1-indexed for getRange
+          if (data[i][5].toString() !== oldPass.toString()) {
+            result = { status: 'error', message: 'รหัสผ่านเดิมไม่ถูกต้อง' };
+            return ContentService.createTextOutput(JSON.stringify(result)).setMimeType(ContentService.MimeType.JSON);
+          }
+          break;
+        }
+      }
+      
+      if (foundIdx !== -1) {
+        empSheet.getRange(foundIdx, 6).setValue(newPass);
+        result = { status: 'success', message: 'เปลี่ยนรหัสผ่านสำเร็จ' };
+      } else {
+        result = { status: 'error', message: 'ไม่พบข้อมูลพนักงาน' };
       }
       
     } else {

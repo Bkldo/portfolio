@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
 import PerformanceForm from './PerformanceForm';
-import { Award, Briefcase, FileText, CheckCircle2, Clock, AlertTriangle, Link as LinkIcon, Edit, LogOut } from 'lucide-react';
+import ChangePasswordModal from './ChangePasswordModal';
+import { Award, Briefcase, FileText, CheckCircle2, Clock, AlertTriangle, Link as LinkIcon, Edit, LogOut, KeyRound } from 'lucide-react';
 import { CONFIG } from '../config';
 
 export default function EmployeeDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [editingPerf, setEditingPerf] = useState(null);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [successToast, setSuccessToast] = useState('');
   const [filterYear, setFilterYear] = useState('2026');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
@@ -62,10 +64,16 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
             </p>
           </div>
         </div>
-        <button className="btn btn-secondary" onClick={onLogout} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-          <LogOut size={16} />
-          ออกจากระบบ
-        </button>
+        <div style={{ display: 'flex', gap: '10px' }}>
+          <button className="btn btn-secondary" onClick={() => setShowPasswordModal(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <KeyRound size={16} style={{ color: 'var(--primary)' }} />
+            เปลี่ยนรหัสผ่าน
+          </button>
+          <button className="btn btn-secondary" onClick={onLogout} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <LogOut size={16} />
+            ออกจากระบบ
+          </button>
+        </div>
       </div>
 
       {/* บล็อกสถิติรายบุคคล */}
@@ -246,6 +254,13 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
           </div>
         </div>
       )}
+
+      <ChangePasswordModal
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        currentUser={currentUser}
+        onSuccess={onRefresh}
+      />
     </div>
   );
 }

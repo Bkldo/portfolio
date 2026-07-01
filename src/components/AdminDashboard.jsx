@@ -3,13 +3,15 @@ import EmployeeProfileForm from './EmployeeProfileForm';
 import {
   Users, UserPlus, Search, ShieldCheck, LogOut, CheckCircle2,
   Building2, BarChart3, TrendingUp, FileText,
-  Clock, AlertTriangle, Link as LinkIcon, ArrowRight
+  Clock, AlertTriangle, Link as LinkIcon, ArrowRight, KeyRound
 } from 'lucide-react';
 import { CONFIG } from '../config';
+import ChangePasswordModal from './ChangePasswordModal';
 
 export default function AdminDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [activeTab, setActiveTab] = useState('stats'); // stats, users
   const [showRegisterModal, setShowRegisterModal] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedDept, setSelectedDept] = useState('ทั้งหมด');
   const [successToast, setSuccessToast] = useState('');
@@ -122,6 +124,10 @@ export default function AdminDashboard({ currentUser, performanceData, employees
           <button className="btn btn-primary" onClick={() => setShowRegisterModal(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center', backgroundColor: '#8b5cf6' }}>
             <UserPlus size={16} />
             ลงทะเบียนบุคคลใหม่
+          </button>
+          <button className="btn btn-secondary" onClick={() => setShowPasswordModal(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+            <KeyRound size={16} style={{ color: 'var(--primary)' }} />
+            เปลี่ยนรหัสผ่าน
           </button>
           <button className="btn btn-secondary" onClick={onLogout} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <LogOut size={16} />
@@ -463,6 +469,13 @@ export default function AdminDashboard({ currentUser, performanceData, employees
           </div>
         </div>
       )}
+
+      <ChangePasswordModal
+        isOpen={showPasswordModal}
+        onClose={() => setShowPasswordModal(false)}
+        currentUser={currentUser}
+        onSuccess={onRefresh}
+      />
     </div>
   );
 }
