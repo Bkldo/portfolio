@@ -1,17 +1,15 @@
 import React, { useState } from 'react';
-import EmployeeProfileForm from './EmployeeProfileForm';
 import {
   Users, BarChart3, TrendingUp, ShieldAlert,
   Search, FolderKanban, FileText, CheckCircle2,
-  Clock, AlertTriangle, Link as LinkIcon, UserPlus, LogOut, ArrowRight
+  Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight
 } from 'lucide-react';
 import { CONFIG } from '../config';
 
 export default function ExecutiveDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
-  const [activeSubTab, setActiveSubTab] = useState('overall'); // overall, department, individual, register
+  const [activeSubTab, setActiveSubTab] = useState('overall'); // overall, department, individual
   const [selectedDept, setSelectedDept] = useState(CONFIG.DEPARTMENTS[1]); // ไอที เป็นดีฟอลต์
   const [selectedEmpId, setSelectedEmpId] = useState(employeesData[1]?.id || ''); // พนักงานคนแรกที่ไม่ใช่ CEO เป็นดีฟอลต์
-  const [showRegisterModal, setShowRegisterModal] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
 
   // --- การคำนวณและเตรียมข้อมูลสำหรับแต่ละส่วน ---
@@ -92,11 +90,6 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
     return e.role !== 'executive' && matchSearch;
   });
 
-  const handleRegisterSuccess = () => {
-    setShowRegisterModal(false);
-    onRefresh();
-  };
-
   return (
     <div>
       {/* แถบหัวข้อต้อนรับผู้บริหาร */}
@@ -108,10 +101,6 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-primary" onClick={() => setShowRegisterModal(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <UserPlus size={16} />
-            ลงทะเบียนพนักงานใหม่
-          </button>
           <button className="btn btn-secondary" onClick={onLogout} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
             <LogOut size={16} />
             ออกจากระบบ
@@ -646,29 +635,6 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                 กรุณาเลือกพนักงานเพื่อดูรายละเอียดและประวัติผลงานรายเดือน
               </div>
             )}
-          </div>
-        </div>
-      )}
-
-      {/* โมดัลสำหรับลงทะเบียนพนักงานใหม่ */}
-      {showRegisterModal && (
-        <div className="modal-overlay">
-          <div className="modal-content" style={{ maxWidth: '650px' }}>
-            <div className="modal-header">
-              <h3 style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-                <UserPlus size={20} />
-                ลงทะเบียนพนักงานและเปิดสิทธิ์ใช้งานระบบ
-              </h3>
-              <button
-                style={{ background: 'none', border: 'none', fontSize: '24px', cursor: 'pointer', color: 'var(--text-light)' }}
-                onClick={() => setShowRegisterModal(false)}
-              >
-                &times;
-              </button>
-            </div>
-            <div className="modal-body" style={{ padding: '20px' }}>
-              <EmployeeProfileForm onSuccess={handleRegisterSuccess} />
-            </div>
           </div>
         </div>
       )}

@@ -24,7 +24,8 @@ function setupSheets() {
     empSheet = ss.insertSheet('Employees');
     empSheet.appendRow(['id', 'name', 'position', 'department', 'email', 'password', 'role', 'image_url']);
     
-    // ใส่ข้อมูลผู้บริหารและพนักงานจำลองตัวอย่าง
+    // ใส่ข้อมูลผู้ใช้ระดับ admin, ผู้บริหาร และพนักงานจำลองตัวอย่าง
+    empSheet.appendRow(['ADM001', 'สมบูรณ์ ระบบดี', 'System Administrator', 'ไอที', 'admin@company.com', '123456', 'admin', 'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150']);
     empSheet.appendRow(['EMP001', 'ผู้บริหาร สูงสุด', 'ประธานเจ้าหน้าที่บริหาร (CEO)', 'ผู้บริหาร', 'ceo@company.com', '123456', 'executive', 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=150']);
     empSheet.appendRow(['EMP002', 'สมชาย รักดี', 'Software Engineer', 'ไอที', 'somchai@company.com', '123456', 'employee', 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150']);
     empSheet.appendRow(['EMP003', 'สมศรี สวยงาม', 'Marketing Manager', 'การตลาด', 'somsri@company.com', '123456', 'employee', 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=150']);
@@ -94,8 +95,7 @@ function doGet(e) {
   }
   
   return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*');
+    .setMimeType(ContentService.MimeType.JSON);
 }
 
 // ฟังก์ชันหลักในการรับ POST Request
@@ -208,6 +208,5 @@ function doPost(e) {
   }
   
   return ContentService.createTextOutput(JSON.stringify(result))
-    .setMimeType(ContentService.MimeType.JSON)
-    .setHeader('Access-Control-Allow-Origin', '*');
+    .setMimeType(ContentService.MimeType.JSON);
 }

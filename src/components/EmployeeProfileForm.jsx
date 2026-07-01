@@ -190,6 +190,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
             >
               <option value="employee">พนักงานทั่วไป (บันทึกและดูผลงานตนเอง)</option>
               <option value="executive">ผู้บริหาร (ดูสถิติภาพรวมและพนักงานทุกคน)</option>
+              <option value="admin">ผู้ดูแลระบบ (จัดการเพิ่มรายชื่อบุคคล)</option>
             </select>
           </div>
 

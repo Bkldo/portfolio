@@ -2,6 +2,16 @@
 
 export const mockEmployees = [
   {
+    id: "ADM001",
+    name: "สมบูรณ์ ระบบดี",
+    position: "System Administrator",
+    department: "ไอที",
+    email: "admin@company.com",
+    password: "password123",
+    role: "admin",
+    image_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=150"
+  },
+  {
     id: "EMP001",
     name: "ดร.มานพ แสนสุข",
     position: "ประธานเจ้าหน้าที่บริหาร (CEO)",
