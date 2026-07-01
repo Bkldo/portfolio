@@ -11,9 +11,9 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
 
   // กรองผลงานเฉพาะของตัวเองตามปีและเดือนที่เลือก
   const myPerformance = performanceData.filter(perf => {
-    const isMe = perf.employee_id === currentUser.id;
-    const matchYear = perf.year === filterYear;
-    const matchMonth = filterMonth === 'ทั้งหมด' || perf.month === filterMonth;
+    const isMe = String(perf?.employee_id || '').trim() === String(currentUser?.id || '').trim();
+    const matchYear = String(perf?.year || '').trim() === String(filterYear || '').trim();
+    const matchMonth = filterMonth === 'ทั้งหมด' || String(perf?.month || '').trim() === String(filterMonth || '').trim();
     return isMe && matchYear && matchMonth;
   });
 
