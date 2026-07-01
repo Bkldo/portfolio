@@ -100,21 +100,6 @@ export default function LoginForm({ onLoginSuccess }) {
             {loading ? 'กำลังเข้าสู่ระบบ...' : 'เข้าสู่ระบบ'}
           </button>
         </form>
-
-        <div style={{ marginTop: '24px', fontSize: '12px', color: '#94a3b8' }}>
-          <p>บัญชีทดสอบในระบบจำลอง (LocalStorage):</p>
-          <div style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'center', gap: '8px', marginTop: '8px' }}>
-            <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
-              <strong>Admin:</strong> 1999999999991 / password123
-            </span>
-            <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
-              <strong>CEO:</strong> 1100100100001 / password123
-            </span>
-            <span style={{ backgroundColor: '#f1f5f9', padding: '2px 6px', borderRadius: '4px' }}>
-              <strong>พนักงาน:</strong> 1100200200002 / password123
-            </span>
-          </div>
-        </div>
       </div>
     </div>
   );
