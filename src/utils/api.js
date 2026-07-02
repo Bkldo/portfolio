@@ -211,6 +211,40 @@ export const updatePerformance = async (performanceData) => {
   throw new Error('ไม่พบข้อมูลผลงานที่ต้องการแก้ไข (LocalStorage Mode)');
 };
 
+// ลบผลงานประจำเดือน
+export const deletePerformance = async (id) => {
+  if (CONFIG.GOOGLE_SCRIPT_URL) {
+    try {
+      const response = await fetch(CONFIG.GOOGLE_SCRIPT_URL, {
+        method: 'POST',
+        mode: 'cors',
+        headers: {
+          'Content-Type': 'text/plain;charset=utf-8',
+        },
+        body: JSON.stringify({
+          action: 'deletePerformance',
+          id: id
+        })
+      });
+      const data = await response.json();
+      if (data.status === 'success') {
+        return data;
+      }
+      throw new Error(data.message || 'เกิดข้อผิดพลาดในการลบผลงาน');
+    } catch (error) {
+      console.error('GAS Delete Performance Error:', error);
+      if (CONFIG.GOOGLE_SCRIPT_URL) throw error;
+    }
+  }
+
+  // Local Storage Delete
+  initializeLocalStorage();
+  const performances = JSON.parse(localStorage.getItem(LOCAL_PERFORMANCE_KEY));
+  const filtered = performances.filter(perf => perf.id.toString() !== id.toString());
+  localStorage.setItem(LOCAL_PERFORMANCE_KEY, JSON.stringify(filtered));
+  return { status: 'success', message: 'ลบผลงานในเครื่องสำเร็จ' };
+};
+
 // เปลี่ยนรหัสผ่านของตัวเอง
 export const changePassword = async (employeeId, oldPassword, newPassword) => {
   if (CONFIG.GOOGLE_SCRIPT_URL) {
