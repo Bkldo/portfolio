@@ -649,9 +649,11 @@ body {
 }
 
 .progress-fill {
+  display: block;
   height: 100%;
   background-color: var(--primary);
   border-radius: 4px;
+  transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* ส่วนแสดงคู่มือช่วยเหลือ */
