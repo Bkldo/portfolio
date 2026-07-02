@@ -22,7 +22,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
     setSuccessMsg('');
 
     if (!empId.trim() || !name.trim() || !position.trim() || !citizenId.trim()) {
-      setError('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (รหัสพนักงาน, ชื่อ, ตำแหน่ง, เลขบัตรประชาชน)');
+      setError('กรุณากรอกข้อมูลที่จำเป็นให้ครบถ้วน (เลขที่ตำแหน่ง, ชื่อ, ตำแหน่ง, เลขบัตรประชาชน)');
       return;
     }
 
@@ -108,11 +108,11 @@ export default function EmployeeProfileForm({ onSuccess }) {
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))', gap: '16px' }}>
           <div className="form-group">
-            <label className="form-label">รหัสพนักงาน (ID) *</label>
+            <label className="form-label">เลขที่ตำแหน่ง *</label>
             <input
               type="text"
               className="form-input"
-              placeholder="เช่น EMP007"
+              placeholder="ระบุเลขที่ตำแหน่ง..."
               value={empId}
               onChange={(e) => setEmpId(e.target.value)}
               required

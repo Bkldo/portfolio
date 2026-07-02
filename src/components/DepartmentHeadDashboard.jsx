@@ -144,7 +144,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
             </div>
             <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-main)' }}>ยินดีต้อนรับ คุณ{currentUser.name}</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-              ตำแหน่ง {currentUser.position} • {formatDept(currentUser.department)} • รหัสพนักงาน {currentUser.id}
+              ตำแหน่ง {currentUser.position} • {formatDept(currentUser.department)} • เลขที่ตำแหน่ง {currentUser.id}
             </p>
           </div>
         </div>
@@ -409,7 +409,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
               <input
                 type="text"
                 className="form-input search-pill-input"
-                placeholder="ค้นหาชื่อ, ตำแหน่ง หรือรหัส..."
+                placeholder="ค้นหาชื่อ, ตำแหน่ง หรือเลขที่ตำแหน่ง..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

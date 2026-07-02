@@ -439,7 +439,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
             <div style={{ display: 'flex', flexWrap: 'wrap', gap: '16px', justifyContent: 'space-between', alignItems: 'center' }}>
               <div style={{ position: 'relative', flex: '1', minWidth: '250px' }}>
                 <Search size={18} style={{ position: 'absolute', left: '12px', top: '50%', transform: 'translateY(-50%)', color: 'var(--text-light)' }} />
-                <input type="text" className="form-input" placeholder="ค้นหาตามรหัส, ชื่อ, ตำแหน่ง หรือเลขบัตรประชาชน..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ paddingLeft: '38px' }} />
+                <input type="text" className="form-input" placeholder="ค้นหาตามเลขที่ตำแหน่ง, ชื่อ, ตำแหน่ง หรือเลขบัตรประชาชน..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} style={{ paddingLeft: '38px' }} />
               </div>
               <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                 <Building2 size={18} style={{ color: 'var(--text-muted)' }} />
@@ -480,7 +480,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                   <thead>
                     <tr style={{ backgroundColor: '#f8fafc', borderBottom: '2px solid var(--border)', textAlign: 'left' }}>
                       <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>บุคลากร</th>
-                      <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>รหัส (ID)</th>
+                      <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>เลขที่ตำแหน่ง</th>
                       <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>ตำแหน่ง</th>
                       <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>สังกัด / ฝ่าย</th>
                       <th style={{ padding: '12px', color: 'var(--text-muted)', fontSize: '13px' }}>เลขบัตรประชาชน</th>
