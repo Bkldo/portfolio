@@ -229,7 +229,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
             แผงควบคุมผู้ดูแลระบบ (Admin Dashboard)
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>
-            ดูสถิติผลงานภาพรวมองค์กร จัดการรายชื่อบุคลากร และลงทะเบียนบุคคลใหม่
+            ดูสถิติผลงานภาพรวม จัดการรายชื่อบุคลากร และลงทะเบียนบุคคลใหม่
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
@@ -243,7 +243,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
       {/* แท็บหลัก */}
       <div className="tabs" style={{ marginBottom: '20px' }}>
         <button className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
-          📊 สถิติผลงานองค์กร
+          📊 สถิติผลงาน
         </button>
         <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
           👥 จัดการบุคลากร
@@ -259,10 +259,10 @@ export default function AdminDashboard({ currentUser, performanceData, employees
           {/* เมนูย่อยสถิติ */}
           <div className="tabs" style={{ marginBottom: '20px' }}>
             <button className={`tab-btn ${statsSubTab === 'overall' ? 'active' : ''}`} onClick={() => setStatsSubTab('overall')}>
-              📊 ภาพรวมองค์กร
+              📊 ภาพรวม
             </button>
             <button className={`tab-btn ${statsSubTab === 'department' ? 'active' : ''}`} onClick={() => setStatsSubTab('department')}>
-              🏢 แยกตามฝ่ายงาน
+              🏢 แยกตามฝ่าย
             </button>
             <button className={`tab-btn ${statsSubTab === 'individual' ? 'active' : ''}`} onClick={() => setStatsSubTab('individual')}>
               👤 ตรวจสอบรายบุคคล
