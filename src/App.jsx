@@ -6,7 +6,8 @@ import AdminDashboard from './components/AdminDashboard';
 import DepartmentHeadDashboard from './components/DepartmentHeadDashboard';
 import { getInitialData } from './utils/api';
 import { CONFIG, formatDept } from './config';
-import { Briefcase, AlertCircle, FileSpreadsheet } from 'lucide-react';
+import { Briefcase, AlertCircle, FileSpreadsheet, KeyRound, LogOut, ChevronDown } from 'lucide-react';
+import ChangePasswordModal from './components/ChangePasswordModal';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -17,6 +18,8 @@ export default function App() {
   const [performanceData, setPerformanceData] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [showProfileMenu, setShowProfileMenu] = useState(false);
+  const [showPasswordModal, setShowPasswordModal] = useState(false);
 
   const loadData = async () => {
     setLoading(true);
@@ -67,8 +70,12 @@ export default function App() {
               </div>
             </div>
 
-            <div className="user-nav-section">
-              <div className="user-profile-summary">
+            <div className="user-nav-section" style={{ position: 'relative' }}>
+              <div
+                className="user-profile-summary"
+                onClick={() => setShowProfileMenu(!showProfileMenu)}
+                style={{ cursor: 'pointer', transition: 'all 0.2s', display: 'flex', alignItems: 'center', gap: '8px' }}
+              >
                 <img
                   src={currentUser.image_url}
                   alt={currentUser.name}
@@ -89,7 +96,89 @@ export default function App() {
                       : formatDept(currentUser.department)}
                   </span>
                 </div>
+                <ChevronDown size={16} style={{ color: '#64748b', marginLeft: '2px' }} />
               </div>
+
+              {showProfileMenu && (
+                <>
+                  <div
+                    style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 40 }}
+                    onClick={() => setShowProfileMenu(false)}
+                  />
+                  <div style={{
+                    position: 'absolute',
+                    top: '100%',
+                    right: '0',
+                    marginTop: '8px',
+                    backgroundColor: '#ffffff',
+                    borderRadius: '12px',
+                    boxShadow: '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+                    border: '1px solid #e2e8f0',
+                    padding: '8px',
+                    minWidth: '200px',
+                    zIndex: 50
+                  }}>
+                    <div style={{ padding: '8px 12px', borderBottom: '1px solid #f1f5f9', marginBottom: '4px' }}>
+                      <div style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a' }}>{currentUser.name}</div>
+                      <div style={{ fontSize: '11px', color: '#64748b' }}>{formatDept(currentUser.department)} ({currentUser.id})</div>
+                    </div>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        setShowPasswordModal(true);
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: 'none',
+                        textAlign: 'left',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: '#1e293b',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#f8fafc'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <KeyRound size={16} style={{ color: 'var(--primary)' }} />
+                      <span>เปลี่ยนรหัสผ่าน</span>
+                    </button>
+                    <button
+                      onClick={() => {
+                        setShowProfileMenu(false);
+                        handleLogout();
+                      }}
+                      style={{
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '10px',
+                        width: '100%',
+                        padding: '10px 12px',
+                        border: 'none',
+                        background: 'none',
+                        textAlign: 'left',
+                        fontSize: '13px',
+                        fontWeight: '600',
+                        color: '#e11d48',
+                        borderRadius: '8px',
+                        cursor: 'pointer',
+                        transition: 'background-color 0.2s'
+                      }}
+                      onMouseOver={(e) => e.currentTarget.style.backgroundColor = '#fff1f2'}
+                      onMouseOut={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
+                    >
+                      <LogOut size={16} />
+                      <span>ออกจากระบบ</span>
+                    </button>
+                  </div>
+                </>
+              )}
             </div>
           </header>
 
@@ -182,6 +271,13 @@ export default function App() {
               </>
             )}
           </main>
+
+          <ChangePasswordModal
+            isOpen={showPasswordModal}
+            onClose={() => setShowPasswordModal(false)}
+            currentUser={currentUser}
+            onSuccess={loadData}
+          />
         </>
       )}
     </div>
