@@ -8,25 +8,55 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
   const [successToast, setSuccessToast] = useState('');
   const [filterYear, setFilterYear] = useState('ทั้งหมด');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
+  const [pageIdx, setPageIdx] = useState(0);
 
-  // กรองผลงานเฉพาะของตัวเองตามปีและเดือนที่เลือก
-  const myPerformance = performanceData.filter(perf => {
+  // ข้อมูลผลงานทั้งหมดของตัวเองตามปีที่เลือก (สำหรับคำนวณสถิติภาพรวมด้านบน)
+  const userYearPerf = performanceData.filter(perf => {
     const isMe = String(perf?.employee_id || '').trim() === String(currentUser?.id || '').trim();
     const matchYear = filterYear === 'ทั้งหมด' || String(perf?.year || '').trim() === String(filterYear || '').trim();
-    const matchMonth = filterMonth === 'ทั้งหมด' || String(perf?.month || '').trim() === String(filterMonth || '').trim();
-    return isMe && matchYear && matchMonth;
+    return isMe && matchYear;
   });
 
-  // คำนวณสถิติส่วนบุคคล
-  const totalSubmissions = myPerformance.length;
-  const doneSubmissions = myPerformance.filter(p => p.status === 'Done').length;
-  const progressSubmissions = myPerformance.filter(p => p.status === 'In Progress').length;
-  const delayedSubmissions = myPerformance.filter(p => p.status === 'Delayed').length;
+  // คำนวณสถิติส่วนบุคคล (ภาพรวมของปี)
+  const totalSubmissions = userYearPerf.length;
+  const doneSubmissions = userYearPerf.filter(p => p.status === 'Done').length;
+  const progressSubmissions = userYearPerf.filter(p => p.status === 'In Progress').length;
+  const delayedSubmissions = userYearPerf.filter(p => p.status === 'Delayed').length;
   
   const avgCompletionRate = totalSubmissions > 0
-    ? Math.round(myPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / totalSubmissions)
+    ? Math.round(userYearPerf.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / totalSubmissions)
     : 0;
-  const myComparison = calcMonthComparison(myPerformance);
+  const myComparison = calcMonthComparison(userYearPerf);
+
+  // เรียงลำดับผลงานจากใหม่ไปเก่า (ล่าสุดขึ้นก่อน)
+  const sortedYearPerf = [...userYearPerf].sort((a, b) => {
+    if (String(a.year) !== String(b.year)) {
+      return parseInt(b.year || 0, 10) - parseInt(a.year || 0, 10);
+    }
+    return CONFIG.MONTHS.indexOf(String(b.month || '')) - CONFIG.MONTHS.indexOf(String(a.month || ''));
+  });
+
+  // หารายชื่อเดือนที่มีข้อมูลจริง เรียงจากล่าสุดไปเก่าสุด
+  const uniqueMonthsList = [];
+  const seenKeys = new Set();
+  sortedYearPerf.forEach(p => {
+    const key = `${p.year}-${p.month}`;
+    if (!seenKeys.has(key)) {
+      seenKeys.add(key);
+      uniqueMonthsList.push({ year: String(p.year || ''), month: String(p.month || ''), key });
+    }
+  });
+
+  // คำนวณการแบ่งหน้า หน้าละ 3 เดือน โดยเริ่มต้นจากเดือนล่าสุด
+  const monthsPerPage = 3;
+  const totalPages = Math.ceil(uniqueMonthsList.length / monthsPerPage) || 1;
+  const activeMonths = uniqueMonthsList.slice(pageIdx * monthsPerPage, (pageIdx + 1) * monthsPerPage);
+  const activeMonthKeys = new Set(activeMonths.map(m => m.key));
+
+  // ผลงานที่แสดงในประวัติ (ถ้าเลือกทั้งหมด จะแสดงหน้าละ 3 เดือนโดยเริ่มจากล่าสุด, ถ้าเลือกเดือนเฉพาะ จะแสดงเดือนนั้น)
+  const displayedPerformance = filterMonth === 'ทั้งหมด'
+    ? sortedYearPerf.filter(p => activeMonthKeys.has(`${p.year}-${p.month}`))
+    : sortedYearPerf.filter(p => String(p.month || '').trim() === String(filterMonth).trim());
 
   const handleActionSuccess = (msg) => {
     setSuccessToast(msg);
@@ -140,7 +170,7 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
                   className="form-select"
                   style={{ width: '100px', padding: '6px 12px' }}
                   value={filterYear}
-                  onChange={(e) => setFilterYear(e.target.value)}
+                  onChange={(e) => { setFilterYear(e.target.value); setPageIdx(0); }}
                 >
                   <option value="ทั้งหมด">ทุกปี</option>
                   <option value="2026">2026</option>
@@ -148,11 +178,11 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
                 </select>
                 <select
                   className="form-select"
-                  style={{ width: '130px', padding: '6px 12px' }}
+                  style={{ width: '170px', padding: '6px 12px' }}
                   value={filterMonth}
-                  onChange={(e) => setFilterMonth(e.target.value)}
+                  onChange={(e) => { setFilterMonth(e.target.value); setPageIdx(0); }}
                 >
-                  <option value="ทั้งหมด">ทุกเดือน</option>
+                  <option value="ทั้งหมด">ล่าสุด (หน้าละ 3 เดือน)</option>
                   {CONFIG.MONTHS.map(m => (
                     <option key={m} value={m}>{m}</option>
                   ))}
@@ -161,13 +191,26 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
             </div>
 
             <div style={{ marginTop: '20px' }} className="timeline-container">
-              {myPerformance.length === 0 ? (
+              {filterMonth === 'ทั้งหมด' && uniqueMonthsList.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px dashed var(--border)' }}>
+                  <span style={{ fontSize: '13px', color: '#475569', fontWeight: '600' }}>
+                    📅 แสดงผล: {activeMonths[0]?.month} {activeMonths[0]?.year} {activeMonths.length > 1 ? `ถึง ${activeMonths[activeMonths.length - 1]?.month} ${activeMonths[activeMonths.length - 1]?.year}` : ''} ({activeMonths.length} เดือน)
+                  </span>
+                  {uniqueMonthsList.length > monthsPerPage && (
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      หน้า {pageIdx + 1} จากทั้งหมด {totalPages} หน้า ({uniqueMonthsList.length} เดือน)
+                    </span>
+                  )}
+                </div>
+              )}
+
+              {displayedPerformance.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
-                  <p>ไม่พบประวัติผลงานในเดือนที่เลือก</p>
+                  <p>ไม่พบประวัติผลงานในเงื่อนไขที่เลือก</p>
                   <p style={{ fontSize: '13px' }}>คุณสามารถเพิ่มข้อมูลใหม่ได้ที่ฟอร์มด้านขวามือ</p>
                 </div>
               ) : (
-                myPerformance.map(perf => (
+                displayedPerformance.map(perf => (
                   <div key={perf.id} className="timeline-item">
                     <div className={`timeline-node ${perf.status === 'Done' ? '' : perf.status === 'In Progress' ? 'progress' : 'delayed'}`}></div>
                     <div className="perf-header" style={{ marginBottom: '8px' }}>
@@ -219,12 +262,49 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
                           style={{ color: '#4f46e5', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '500' }}
                         >
                           <LinkIcon size={14} />
-                          ดูไฟล์อ้างอิง
+                          ไฟล์อ้างอิง
                         </a>
                       )}
                     </div>
                   </div>
                 ))
+              )}
+
+              {filterMonth === 'ทั้งหมด' && uniqueMonthsList.length > monthsPerPage && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={pageIdx === 0}
+                    onClick={() => setPageIdx(Math.max(0, pageIdx - 1))}
+                    style={{ padding: '6px 14px', fontSize: '13px', opacity: pageIdx === 0 ? 0.5 : 1, cursor: pageIdx === 0 ? 'not-allowed' : 'pointer' }}
+                  >
+                    &lt; ย้อนดู 3 เดือนใหม่กว่า
+                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {Array.from({ length: totalPages }, (_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setPageIdx(idx)}
+                        style={{
+                          width: '30px', height: '30px', borderRadius: '6px', border: '1px solid var(--border)',
+                          backgroundColor: pageIdx === idx ? 'var(--primary)' : 'var(--card-bg)',
+                          color: pageIdx === idx ? '#fff' : 'var(--text-main)',
+                          fontSize: '13px', fontWeight: '600', cursor: 'pointer'
+                        }}
+                      >
+                        {idx + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={pageIdx >= totalPages - 1}
+                    onClick={() => setPageIdx(Math.min(totalPages - 1, pageIdx + 1))}
+                    style={{ padding: '6px 14px', fontSize: '13px', opacity: pageIdx >= totalPages - 1 ? 0.5 : 1, cursor: pageIdx >= totalPages - 1 ? 'not-allowed' : 'pointer' }}
+                  >
+                    ดู 3 เดือนเก่ากว่า &gt;
+                  </button>
+                </div>
               )}
             </div>
           </div>

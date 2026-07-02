@@ -16,6 +16,9 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
   const [deleteError, setDeleteError] = useState('');
   const [filterYear, setFilterYear] = useState('ทั้งหมด');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
+  const [myFilterYear, setMyFilterYear] = useState('ทั้งหมด');
+  const [myFilterMonth, setMyFilterMonth] = useState('ทั้งหมด');
+  const [myPageIdx, setMyPageIdx] = useState(0);
 
   // กรองรายชื่อเจ้าหน้าที่ทั้งหมดในฝ่ายของหัวหน้าฝ่าย
   const deptEmployees = employeesData.filter(e => isSameDept(e.department, currentUser.department));
@@ -65,7 +68,38 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
   const empComparison = calcMonthComparison(selectedEmpPerformance);
 
   // ข้อมูลผลงานของตัวหัวหน้าฝ่ายเอง (สำหรับแท็บบันทึกผลงานตนเอง)
-  const myPerformance = (performanceData || []).filter(p => p.employee_id === currentUser.id);
+  const myYearPerf = (performanceData || []).filter(p => {
+    const isMe = p.employee_id === currentUser.id;
+    const matchYear = myFilterYear === 'ทั้งหมด' || String(p.year || '').trim() === String(myFilterYear || '').trim();
+    return isMe && matchYear;
+  });
+
+  const sortedMyPerf = [...myYearPerf].sort((a, b) => {
+    if (String(a.year) !== String(b.year)) {
+      return parseInt(b.year || 0, 10) - parseInt(a.year || 0, 10);
+    }
+    return CONFIG.MONTHS.indexOf(String(b.month || '')) - CONFIG.MONTHS.indexOf(String(a.month || ''));
+  });
+
+  const myUniqueMonthsList = [];
+  const mySeenKeys = new Set();
+  sortedMyPerf.forEach(p => {
+    const key = `${p.year}-${p.month}`;
+    if (!mySeenKeys.has(key)) {
+      mySeenKeys.add(key);
+      myUniqueMonthsList.push({ year: String(p.year || ''), month: String(p.month || ''), key });
+    }
+  });
+
+  const myTotalPages = Math.ceil(myUniqueMonthsList.length / 3) || 1;
+  const myActiveMonths = myUniqueMonthsList.slice(myPageIdx * 3, (myPageIdx + 1) * 3);
+  const myActiveMonthKeys = new Set(myActiveMonths.map(m => m.key));
+
+  const displayedMyPerformance = myFilterMonth === 'ทั้งหมด'
+    ? sortedMyPerf.filter(p => myActiveMonthKeys.has(`${p.year}-${p.month}`))
+    : sortedMyPerf.filter(p => String(p.month || '').trim() === String(myFilterMonth).trim());
+
+  const myPerformance = displayedMyPerformance;
 
   // ฟังก์ชันลบผลงานของตนเอง
   const handleDeleteMyPerf = async (id) => {
@@ -621,8 +655,45 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
 
           {/* รายการผลงานทั้งหมดของหัวหน้าฝ่าย */}
           <div className="card">
-            <h3 className="card-title">📋 ประวัติรายงานผลงานของฉัน ({myPerformance.length} รายการ)</h3>
-            <div className="perf-list">
+            <div className="card-title" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', margin: 0, paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
+              <span>📋 ประวัติรายงานผลงานของฉัน ({myYearPerf.length} รายการ)</span>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <select
+                  className="form-select"
+                  style={{ width: '100px', padding: '6px 12px' }}
+                  value={myFilterYear}
+                  onChange={(e) => { setMyFilterYear(e.target.value); setMyPageIdx(0); }}
+                >
+                  <option value="ทั้งหมด">ทุกปี</option>
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                </select>
+                <select
+                  className="form-select"
+                  style={{ width: '170px', padding: '6px 12px' }}
+                  value={myFilterMonth}
+                  onChange={(e) => { setMyFilterMonth(e.target.value); setMyPageIdx(0); }}
+                >
+                  <option value="ทั้งหมด">ล่าสุด (หน้าละ 3 เดือน)</option>
+                  {CONFIG.MONTHS.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="perf-list" style={{ marginTop: '20px' }}>
+              {myFilterMonth === 'ทั้งหมด' && myUniqueMonthsList.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px dashed var(--border)' }}>
+                  <span style={{ fontSize: '13px', color: '#475569', fontWeight: '600' }}>
+                    📅 แสดงผล: {myActiveMonths[0]?.month} {myActiveMonths[0]?.year} {myActiveMonths.length > 1 ? `ถึง ${myActiveMonths[myActiveMonths.length - 1]?.month} ${myActiveMonths[myActiveMonths.length - 1]?.year}` : ''} ({myActiveMonths.length} เดือน)
+                  </span>
+                  {myUniqueMonthsList.length > 3 && (
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      หน้า {myPageIdx + 1} จากทั้งหมด {myTotalPages} หน้า ({myUniqueMonthsList.length} เดือน)
+                    </span>
+                  )}
+                </div>
+              )}
               {myPerformance.length === 0 ? (
                 <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
                   คุณยังไม่ได้บันทึกผลงานใดๆ ในระบบ
@@ -680,6 +751,43 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
                     </div>
                   </div>
                 ))
+              )}
+
+              {myFilterMonth === 'ทั้งหมด' && myUniqueMonthsList.length > 3 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={myPageIdx === 0}
+                    onClick={() => setMyPageIdx(Math.max(0, myPageIdx - 1))}
+                    style={{ padding: '6px 14px', fontSize: '13px', opacity: myPageIdx === 0 ? 0.5 : 1, cursor: myPageIdx === 0 ? 'not-allowed' : 'pointer' }}
+                  >
+                    &lt; ย้อนดู 3 เดือนใหม่กว่า
+                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {Array.from({ length: myTotalPages }, (_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setMyPageIdx(idx)}
+                        style={{
+                          width: '30px', height: '30px', borderRadius: '6px', border: '1px solid var(--border)',
+                          backgroundColor: myPageIdx === idx ? 'var(--primary)' : 'var(--card-bg)',
+                          color: myPageIdx === idx ? '#fff' : 'var(--text-main)',
+                          fontSize: '13px', fontWeight: '600', cursor: 'pointer'
+                        }}
+                      >
+                        {idx + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={myPageIdx >= myTotalPages - 1}
+                    onClick={() => setMyPageIdx(Math.min(myTotalPages - 1, myPageIdx + 1))}
+                    style={{ padding: '6px 14px', fontSize: '13px', opacity: myPageIdx >= myTotalPages - 1 ? 0.5 : 1, cursor: myPageIdx >= myTotalPages - 1 ? 'not-allowed' : 'pointer' }}
+                  >
+                    ดู 3 เดือนเก่ากว่า &gt;
+                  </button>
+                </div>
               )}
             </div>
           </div>
