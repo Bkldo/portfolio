@@ -357,7 +357,9 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                           onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }} />
                         <div>
                           <h3 style={{ fontSize: '18px', fontWeight: '700' }}>{selectedEmployee.name}</h3>
-                          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{selectedEmployee.position} • {formatDept(selectedEmployee.department)}</p>
+                          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>
+                            {selectedEmployee.position} • {formatDept(selectedEmployee.department)} • <span style={{ fontWeight: '600', color: 'var(--text-main)' }}>เลขที่ตำแหน่ง: {selectedEmployee.id || '-'}</span>
+                          </p>
                         </div>
                       </div>
                     </div>

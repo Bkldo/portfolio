@@ -105,6 +105,13 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
                   <Building2 size={14} style={{ color: '#94a3b8' }} />
                   {formatDept(currentUser.department)}
                 </span>
+                <span style={{ color: '#cbd5e1' }}>•</span>
+                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                  <span>เลขที่ตำแหน่ง</span>
+                  <span style={{ backgroundColor: '#f1f5f9', color: '#334155', fontWeight: '600', padding: '2px 8px', borderRadius: '6px', border: '1px solid #e2e8f0' }}>
+                    {currentUser.id || '-'}
+                  </span>
+                </span>
               </div>
             </div>
           </div>
