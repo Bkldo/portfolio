@@ -58,6 +58,8 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
     ? sortedYearPerf.filter(p => activeMonthKeys.has(`${p.year}-${p.month}`))
     : sortedYearPerf.filter(p => String(p.month || '').trim() === String(filterMonth).trim());
 
+  const myPerformance = displayedPerformance;
+
   const handleActionSuccess = (msg) => {
     setSuccessToast(msg);
     setEditingPerf(null);
@@ -125,7 +127,7 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
             <span className="stat-card-title">เสร็จสมบูรณ์</span>
             <div className="stat-card-icon-sm" style={{ backgroundColor: '#ecfdf5', color: '#10b981' }}><CheckCircle2 size={18} /></div>
           </div>
-          <div className="stat-card-value">{myPerformance.filter(p => p.status === 'Done').length}</div>
+          <div className="stat-card-value">{doneSubmissions}</div>
           <div className="stat-card-subtitle"><span>ความสำเร็จ</span><span>{avgCompletionRate}%</span></div>
         </div>
 
