@@ -20,6 +20,31 @@ export default function AdminDashboard({ currentUser, performanceData, employees
   const [empSearchQuery, setEmpSearchQuery] = useState('');
   const [filterYear, setFilterYear] = useState('ทั้งหมด');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
+  const [showExecInInspection, setShowExecInInspection] = useState(() => {
+    return localStorage.getItem('show_exec_in_inspection') === 'true';
+  });
+
+  const isExecutiveUser = (e) => {
+    if (!e) return false;
+    const role = String(e.role || '').toLowerCase();
+    const dept = String(e.department || '').trim();
+    const pos = String(e.position || '').trim();
+    return role === 'executive' || 
+           dept === 'ผู้บริหาร' || 
+           dept.toLowerCase() === 'executive' || 
+           pos.includes('ผู้อำนวยการเขต') || 
+           pos.includes('ผู้ช่วยผู้อำนวยการ');
+  };
+
+  const sortHeadFirst = (list) => {
+    return [...list].sort((a, b) => {
+      const aIsHead = String(a.role || '').toLowerCase() === 'head' || String(a.position || '').includes('หัวหน้า');
+      const bIsHead = String(b.role || '').toLowerCase() === 'head' || String(b.position || '').includes('หัวหน้า');
+      if (aIsHead && !bIsHead) return -1;
+      if (!aIsHead && bIsHead) return 1;
+      return 0;
+    });
+  };
 
   // ===== สถิติบุคลากร =====
   const totalUsers = employeesData.length;
@@ -58,7 +83,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
   const maxSubmissions = Math.max(...deptStats.map(d => d.submissions), 1);
 
   // ข้อมูลฝ่ายที่เลือก
-  const deptEmployees = employeesData.filter(e => isSameDept(e.department, statsDept));
+  const deptEmployees = sortHeadFirst(employeesData.filter(e => isSameDept(e.department, statsDept)));
   const deptEmpIds = deptEmployees.map(e => e.id);
   const deptPerformance = perfData.filter(p => deptEmpIds.includes(p.employee_id));
   const deptDone = deptPerformance.filter(p => p.status === 'Done').length;
@@ -67,10 +92,22 @@ export default function AdminDashboard({ currentUser, performanceData, employees
   const deptAvgRate = deptPerformance.length > 0
     ? Math.round(deptPerformance.reduce((a, c) => a + parseInt(c.completion_rate || 0, 10), 0) / deptPerformance.length) : 0;
 
+  const filteredEmpList = sortHeadFirst(employeesData.filter(e => {
+    const q = empSearchQuery.toLowerCase();
+    const isExec = isExecutiveUser(e);
+    return e.role !== 'admin' && (showExecInInspection || !isExec) && (
+      String(e.name || '').toLowerCase().includes(q) || String(e.id || '').toLowerCase().includes(q) || String(e.department || '').toLowerCase().includes(q)
+    );
+  }));
+
   // ข้อมูลรายบุคคล
-  const selectedEmployee = employeesData.find(e => e.id === selectedEmpId);
+  const validSelectedEmpId = (filteredEmpList.some(e => e.id === selectedEmpId))
+    ? selectedEmpId
+    : (filteredEmpList[0]?.id || '');
+
+  const selectedEmployee = employeesData.find(e => e.id === validSelectedEmpId);
   const empPerformance = perfData.filter(p => {
-    if (p.employee_id !== selectedEmpId) return false;
+    if (p.employee_id !== validSelectedEmpId) return false;
     if (filterYear !== 'ทั้งหมด' && String(p.year || '').trim() !== String(filterYear)) return false;
     if (filterMonth !== 'ทั้งหมด' && String(p.month || '').trim() !== String(filterMonth)) return false;
     return true;
@@ -80,13 +117,6 @@ export default function AdminDashboard({ currentUser, performanceData, employees
   const empDelayed = empPerformance.filter(p => p.status === 'Delayed').length;
   const empAvgRate = empPerformance.length > 0
     ? Math.round(empPerformance.reduce((a, c) => a + parseInt(c.completion_rate || 0, 10), 0) / empPerformance.length) : 0;
-
-  const filteredEmpList = employeesData.filter(e => {
-    const q = empSearchQuery.toLowerCase();
-    return e.role !== 'executive' && e.role !== 'admin' && (
-      e.name.toLowerCase().includes(q) || e.id.toLowerCase().includes(q) || e.department.toLowerCase().includes(q)
-    );
-  });
 
   // กรองรายชื่อสำหรับแท็บจัดการผู้ใช้
   const filteredEmployees = employeesData.filter(e => {
@@ -304,8 +334,8 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                 {filteredEmpList.map(emp => (
                   <div key={emp.id} onClick={() => setSelectedEmpId(emp.id)} style={{
                     display: 'flex', alignItems: 'center', gap: '10px', padding: '10px', borderRadius: '8px', cursor: 'pointer', marginBottom: '4px',
-                    backgroundColor: selectedEmpId === emp.id ? 'var(--primary-light)' : 'transparent',
-                    border: selectedEmpId === emp.id ? '1px solid var(--primary)' : '1px solid transparent'
+                    backgroundColor: validSelectedEmpId === emp.id ? 'var(--primary-light)' : 'transparent',
+                    border: validSelectedEmpId === emp.id ? '1px solid var(--primary)' : '1px solid transparent'
                   }}>
                     <img src={emp.image_url} alt={emp.name} style={{ width: '36px', height: '36px', borderRadius: '50%', objectFit: 'cover' }}
                       onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }} />
@@ -418,6 +448,22 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                   {CONFIG.DEPARTMENTS.map(d => (<option key={d} value={d}>{d}</option>))}
                 </select>
               </div>
+            </div>
+            <div style={{ display: 'flex', alignItems: 'center', gap: '8px', paddingTop: '12px', borderTop: '1px solid var(--border)' }}>
+              <label style={{ display: 'flex', alignItems: 'center', gap: '8px', fontSize: '13px', color: 'var(--text-main)', cursor: 'pointer', fontWeight: '500' }}>
+                <input 
+                  type="checkbox" 
+                  checked={showExecInInspection} 
+                  onChange={(e) => {
+                    const val = e.target.checked;
+                    setShowExecInInspection(val);
+                    localStorage.setItem('show_exec_in_inspection', val ? 'true' : 'false');
+                    onRefresh();
+                  }} 
+                  style={{ width: '16px', height: '16px', cursor: 'pointer' }}
+                />
+                <span>แสดงข้อมูลผู้บริหาร (ผู้อำนวยการเขต/ผู้ช่วยผู้อำนวยการเขต) ในหน้าตรวจสอบรายบุคคล</span>
+              </label>
             </div>
           </div>
 

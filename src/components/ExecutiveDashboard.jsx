@@ -15,6 +15,30 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   const [filterYear, setFilterYear] = useState('ทั้งหมด');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
 
+  const showExecInInspection = localStorage.getItem('show_exec_in_inspection') === 'true';
+
+  const isExecutiveUser = (e) => {
+    if (!e) return false;
+    const role = String(e.role || '').toLowerCase();
+    const dept = String(e.department || '').trim();
+    const pos = String(e.position || '').trim();
+    return role === 'executive' || 
+           dept === 'ผู้บริหาร' || 
+           dept.toLowerCase() === 'executive' || 
+           pos.includes('ผู้อำนวยการเขต') || 
+           pos.includes('ผู้ช่วยผู้อำนวยการ');
+  };
+
+  const sortHeadFirst = (list) => {
+    return [...list].sort((a, b) => {
+      const aIsHead = String(a.role || '').toLowerCase() === 'head' || String(a.position || '').includes('หัวหน้า');
+      const bIsHead = String(b.role || '').toLowerCase() === 'head' || String(b.position || '').includes('หัวหน้า');
+      if (aIsHead && !bIsHead) return -1;
+      if (!aIsHead && bIsHead) return 1;
+      return 0;
+    });
+  };
+
   // --- การคำนวณและเตรียมข้อมูลสำหรับแต่ละส่วน ---
 
   // 1. ภาพรวม (Overall)
@@ -63,7 +87,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   const maxAvgRate = Math.max(...deptStats.map(d => d.avgRate), 1);
 
   // 2. ข้อมูลฝ่าย (Department View)
-  const deptEmployees = employeesData.filter(e => isSameDept(e.department, selectedDept));
+  const deptEmployees = sortHeadFirst(employeesData.filter(e => isSameDept(e.department, selectedDept)));
   const deptEmpIds = deptEmployees.map(e => e.id);
   const deptPerformance = performanceData.filter(p => deptEmpIds.includes(p.employee_id));
   
@@ -75,10 +99,23 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
     ? Math.round(deptPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / deptPerformance.length)
     : 0;
 
+  // กรองรายชื่อพนักงานสำหรับค้นหาในโหมดรายบุคคล
+  const filteredEmployees = sortHeadFirst(employeesData.filter(e => {
+    const matchSearch = String(e.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
+                        String(e.department || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
+                        String(e.id || '').toLowerCase().includes(searchQuery.toLowerCase());
+    const isExec = isExecutiveUser(e);
+    return (showExecInInspection || !isExec) && matchSearch;
+  }));
+
   // 3. ข้อมูลรายบุคคล (Individual View)
-  const selectedEmployee = employeesData.find(e => e.id === selectedEmpId);
+  const validSelectedEmpId = (filteredEmployees.some(e => e.id === selectedEmpId))
+    ? selectedEmpId
+    : (filteredEmployees[0]?.id || '');
+
+  const selectedEmployee = employeesData.find(e => e.id === validSelectedEmpId);
   const empPerformance = performanceData.filter(p => {
-    if (p.employee_id !== selectedEmpId) return false;
+    if (p.employee_id !== validSelectedEmpId) return false;
     if (filterYear !== 'ทั้งหมด' && String(p.year || '').trim() !== String(filterYear)) return false;
     if (filterMonth !== 'ทั้งหมด' && String(p.month || '').trim() !== String(filterMonth)) return false;
     return true;
@@ -91,14 +128,6 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
     ? Math.round(empPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / empPerformance.length)
     : 0;
   const empComparison = calcMonthComparison(empPerformance);
-
-  // กรองรายชื่อพนักงานสำหรับค้นหาในโหมดรายบุคคล
-  const filteredEmployees = employeesData.filter(e => {
-    const matchSearch = e.name.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                        e.department.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                        e.id.toLowerCase().includes(searchQuery.toLowerCase());
-    return e.role !== 'executive' && matchSearch;
-  });
 
   return (
     <div>
@@ -482,14 +511,14 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                   <div
                     key={emp.id}
                     onClick={() => setSelectedEmpId(emp.id)}
-                    className={`emp-sidebar-item ${selectedEmpId === emp.id ? 'active' : 'inactive'}`}
+                    className={`emp-sidebar-item ${validSelectedEmpId === emp.id ? 'active' : 'inactive'}`}
                   >
                     <img src={emp.image_url} alt={emp.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.3)' }} onError={(e) => e.target.src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} />
                     <div style={{ overflow: 'hidden', flex: 1, textAlign: 'left' }}>
                       <div style={{ fontSize: '14px', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{emp.name}</div>
-                      <div style={{ fontSize: '11px', opacity: selectedEmpId === emp.id ? 0.9 : 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{emp.position || formatDept(emp.department)}</div>
+                      <div style={{ fontSize: '11px', opacity: validSelectedEmpId === emp.id ? 0.9 : 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{emp.position || formatDept(emp.department)}</div>
                     </div>
-                    <ArrowRight size={16} style={{ opacity: selectedEmpId === emp.id ? 1 : 0.3 }} />
+                    <ArrowRight size={16} style={{ opacity: validSelectedEmpId === emp.id ? 1 : 0.3 }} />
                   </div>
                 ))
               )}
