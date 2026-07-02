@@ -209,7 +209,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
         <div>
           <h2 style={{ fontSize: '20px', fontWeight: '700', color: 'var(--text-main)' }}>🤵 แผงควบคุมผู้บริหาร (Executive Dashboard)</h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-            ดูภาพรวมผลการดำเนินงานของพนักงานทุกฝ่ายในองค์กรย้อนหลังและข้อมูลการปฏิบัติงานจริง
+            ดูภาพรวมผลการดำเนินงานของข้าราชการทุกฝ่ายย้อนหลังและข้อมูลการปฏิบัติงานจริง
           </p>
         </div>
       </div>
@@ -220,13 +220,13 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           className={`tab-btn ${activeSubTab === 'overall' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('overall')}
         >
-          📊 ภาพรวมองค์กร
+          📊 ภาพรวม
         </button>
         <button
           className={`tab-btn ${activeSubTab === 'department' ? 'active' : ''}`}
           onClick={() => setActiveSubTab('department')}
         >
-          🏢 แยกตามฝ่ายงาน
+          🏢 แยกตามฝ่าย
         </button>
         <button
           className={`tab-btn ${activeSubTab === 'individual' ? 'active' : ''}`}
@@ -348,14 +348,14 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
             </div>
           </div>
 
-          {/* ตารางแสดงภาพรวมสถานะตามฝ่ายงาน */}
+          {/* ตารางแสดงภาพรวมสถานะตามฝ่าย */}
           <div className="card">
-            <h3 className="card-title">🏢 สรุปสถานะประสิทธิภาพตามฝ่ายงาน</h3>
+            <h3 className="card-title">🏢 สรุปสถานะประสิทธิภาพตามฝ่าย</h3>
             <div className="table-container">
               <table className="custom-table">
                 <thead>
                   <tr>
-                    <th>ฝ่ายงาน</th>
+                    <th>ฝ่าย</th>
                     <th>จำนวนบุคลากร</th>
                     <th>ผลงานที่บันทึกรวม</th>
                     <th>ความคืบหน้าเฉลี่ย</th>
@@ -406,10 +406,10 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
       {/* ======================================================== */}
       {activeSubTab === 'department' && (
         <div>
-          {/* ตัวเลือกฝ่ายงาน */}
+          {/* ตัวเลือกฝ่าย */}
           <div className="card" style={{ marginBottom: '20px' }}>
             <div className="form-group" style={{ margin: 0, maxWidth: '300px' }}>
-              <label className="form-label">เลือกฝ่ายงานที่ต้องการตรวจสอบ</label>
+              <label className="form-label">เลือกฝ่ายที่ต้องการตรวจสอบ</label>
               <select
                 className="form-select"
                 value={selectedDept}
@@ -569,14 +569,14 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           <div className="card" style={{ padding: '20px' }}>
             <div style={{ marginBottom: '16px' }}>
               <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '2px' }}>รายชื่อพนักงาน</h3>
-              <p style={{ fontSize: '12px', color: '#64748b' }}>รายชื่อทั้งหมดในองค์กร ({filteredEmployees.length} คน)</p>
+              <p style={{ fontSize: '12px', color: '#64748b' }}>รายชื่อทั้งหมดในหน่วยงาน ({filteredEmployees.length} คน)</p>
             </div>
             <div className="form-group" style={{ position: 'relative', marginBottom: '16px' }}>
               <Search size={16} style={{ position: 'absolute', left: '14px', top: '11px', color: '#94a3b8' }} />
               <input
                 type="text"
                 className="form-input search-pill-input"
-                placeholder="ค้นหาพนักงาน..."
+                placeholder="ค้นหาบุคลากร..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
@@ -608,7 +608,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           <div>
             {selectedEmployee ? (
               <div>
-                {/* ข้อมูลโปรไฟล์พนักงาน (Performance Insights Style) */}
+                {/* ข้อมูลโปรไฟล์บุคลากร (Performance Insights Style) */}
                 <div className="card" style={{ marginBottom: '24px', padding: '24px' }}>
                   <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
                     <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '24px' }}>
