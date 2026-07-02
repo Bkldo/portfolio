@@ -3,8 +3,9 @@ import LoginForm from './components/LoginForm';
 import EmployeeDashboard from './components/EmployeeDashboard';
 import ExecutiveDashboard from './components/ExecutiveDashboard';
 import AdminDashboard from './components/AdminDashboard';
+import DepartmentHeadDashboard from './components/DepartmentHeadDashboard';
 import { getInitialData } from './utils/api';
-import { CONFIG } from './config';
+import { CONFIG, formatDept } from './config';
 import { Briefcase, AlertCircle, FileSpreadsheet } from 'lucide-react';
 
 export default function App() {
@@ -79,7 +80,13 @@ export default function App() {
                 <div className="user-info-text">
                   <div className="user-name-text">{currentUser.name}</div>
                   <span className="user-role-badge">
-                    {currentUser.role === 'admin' ? 'ผู้ดูแลระบบ (Admin)' : currentUser.role === 'executive' ? 'ผู้บริหาร (Executive)' : `ฝ่าย${currentUser.department}`}
+                    {currentUser.role === 'admin'
+                      ? 'ผู้ดูแลระบบ (Admin)'
+                      : currentUser.role === 'executive'
+                      ? 'ผู้บริหาร (Executive)'
+                      : currentUser.role === 'head' || currentUser.role === 'supervisor' || currentUser.role === 'manager' || currentUser.role === 'หัวหน้าฝ่าย'
+                      ? `หัวหน้า${formatDept(currentUser.department)}`
+                      : formatDept(currentUser.department)}
                   </span>
                 </div>
               </div>
@@ -149,6 +156,14 @@ export default function App() {
                   />
                 ) : currentUser.role === 'executive' ? (
                   <ExecutiveDashboard
+                    currentUser={currentUser}
+                    performanceData={performanceData}
+                    employeesData={employeesData}
+                    onRefresh={loadData}
+                    onLogout={handleLogout}
+                  />
+                ) : currentUser.role === 'head' || currentUser.role === 'supervisor' || currentUser.role === 'manager' || currentUser.role === 'หัวหน้าฝ่าย' ? (
+                  <DepartmentHeadDashboard
                     currentUser={currentUser}
                     performanceData={performanceData}
                     employeesData={employeesData}
