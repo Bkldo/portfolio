@@ -5,7 +5,7 @@ import {
   Building2, BarChart3, TrendingUp, FileText,
   Clock, AlertTriangle, Link as LinkIcon, ArrowRight, KeyRound
 } from 'lucide-react';
-import { CONFIG } from '../config';
+import { CONFIG, formatDept, isSameDept } from '../config';
 import ChangePasswordModal from './ChangePasswordModal';
 
 export default function AdminDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
@@ -48,7 +48,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
 
   // กราฟข้อมูลฝ่าย
   const deptStats = CONFIG.DEPARTMENTS.filter(d => d !== 'ผู้บริหาร').map(dept => {
-    const deptEmps = employeesData.filter(e => e.department === dept);
+    const deptEmps = employeesData.filter(e => isSameDept(e.department, dept));
     const deptEmpIds = deptEmps.map(e => e.id);
     const deptSubs = perfData.filter(p => deptEmpIds.includes(p.employee_id));
     const deptAvg = deptSubs.length > 0
@@ -58,7 +58,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
   const maxSubmissions = Math.max(...deptStats.map(d => d.submissions), 1);
 
   // ข้อมูลฝ่ายที่เลือก
-  const deptEmployees = employeesData.filter(e => e.department === statsDept);
+  const deptEmployees = employeesData.filter(e => isSameDept(e.department, statsDept));
   const deptEmpIds = deptEmployees.map(e => e.id);
   const deptPerformance = perfData.filter(p => deptEmpIds.includes(p.employee_id));
   const deptDone = deptPerformance.filter(p => p.status === 'Done').length;
@@ -89,7 +89,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                         e.id.toLowerCase().includes(searchQuery.toLowerCase()) ||
                         (e.citizen_id || '').includes(searchQuery) ||
                         e.position.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchDept = selectedDept === 'ทั้งหมด' || e.department === selectedDept;
+    const matchDept = selectedDept === 'ทั้งหมด' || isSameDept(e.department, selectedDept);
     return matchSearch && matchDept;
   });
 
@@ -264,7 +264,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                 </div>
               </div>
               <div className="card" style={{ marginTop: '20px' }}>
-                <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px' }}>📝 รายการผลงานของฝ่าย{statsDept} (ทั้งหมด {deptPerformance.length} รายการ)</h3>
+                <h3 style={{ fontSize: '16px', fontWeight: '700', marginBottom: '16px' }}>📝 รายการผลงานของ{formatDept(statsDept)} (ทั้งหมด {deptPerformance.length} รายการ)</h3>
                 {deptPerformance.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>ยังไม่มีข้อมูลรายงานผลงานของฝ่ายนี้</div>
                 ) : (
@@ -330,7 +330,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                           onError={(e) => { e.target.src = "https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"; }} />
                         <div>
                           <h3 style={{ fontSize: '18px', fontWeight: '700' }}>{selectedEmployee.name}</h3>
-                          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{selectedEmployee.position} • ฝ่าย{selectedEmployee.department}</p>
+                          <p style={{ color: 'var(--text-muted)', fontSize: '13px' }}>{selectedEmployee.position} • {formatDept(selectedEmployee.department)}</p>
                         </div>
                       </div>
                     </div>
@@ -431,15 +431,15 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                         </td>
                         <td style={{ padding: '12px', fontWeight: '600', color: 'var(--text-muted)' }}>{emp.id}</td>
                         <td style={{ padding: '12px', color: 'var(--text-main)' }}>{emp.position}</td>
-                        <td style={{ padding: '12px' }}><span style={{ backgroundColor: '#f1f5f9', color: '#475569', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>{emp.department}</span></td>
+                        <td style={{ padding: '12px' }}><span style={{ backgroundColor: '#f1f5f9', color: '#475569', padding: '4px 8px', borderRadius: '6px', fontSize: '12px', fontWeight: '600' }}>{formatDept(emp.department)}</span></td>
                         <td style={{ padding: '12px', color: 'var(--text-muted)', fontFamily: 'monospace', letterSpacing: '1px' }}>{emp.citizen_id || '-'}</td>
                         <td style={{ padding: '12px' }}>
                           <span style={{
                             padding: '4px 10px', borderRadius: '20px', fontSize: '12px', fontWeight: '600',
-                            backgroundColor: emp.role === 'admin' ? '#f3e8ff' : emp.role === 'executive' ? '#fef3c7' : '#e0f2fe',
-                            color: emp.role === 'admin' ? '#7e22ce' : emp.role === 'executive' ? '#b45309' : '#0369a1'
+                            backgroundColor: emp.role === 'admin' ? '#f3e8ff' : emp.role === 'executive' ? '#fef3c7' : emp.role === 'head' || emp.role === 'supervisor' || emp.role === 'manager' || emp.role === 'หัวหน้าฝ่าย' ? '#ecfdf5' : '#e0f2fe',
+                            color: emp.role === 'admin' ? '#7e22ce' : emp.role === 'executive' ? '#b45309' : emp.role === 'head' || emp.role === 'supervisor' || emp.role === 'manager' || emp.role === 'หัวหน้าฝ่าย' ? '#059669' : '#0369a1'
                           }}>
-                            {emp.role === 'admin' ? '🛡️ ผู้ดูแลระบบ' : emp.role === 'executive' ? '🤵 ผู้บริหาร' : '👤 พนักงานทั่วไป'}
+                            {emp.role === 'admin' ? '🛡️ ผู้ดูแลระบบ' : emp.role === 'executive' ? '🤵 ผู้บริหาร' : emp.role === 'head' || emp.role === 'supervisor' || emp.role === 'manager' || emp.role === 'หัวหน้าฝ่าย' ? '👨‍💼 หัวหน้าฝ่าย' : '👤 พนักงานทั่วไป'}
                           </span>
                         </td>
                       </tr>

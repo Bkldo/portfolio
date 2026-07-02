@@ -4,7 +4,7 @@ import {
   Search, FolderKanban, FileText, CheckCircle2,
   Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight, KeyRound
 } from 'lucide-react';
-import { CONFIG } from '../config';
+import { CONFIG, formatDept, isSameDept } from '../config';
 import ChangePasswordModal from './ChangePasswordModal';
 
 export default function ExecutiveDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
@@ -39,7 +39,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
 
   // กราฟ 1: เปรียบเทียบจำนวนการส่งผลงานแยกตามฝ่าย
   const deptStats = CONFIG.DEPARTMENTS.filter(d => d !== 'ผู้บริหาร').map(dept => {
-    const deptEmployees = employeesData.filter(e => e.department === dept);
+    const deptEmployees = employeesData.filter(e => isSameDept(e.department, dept));
     const deptEmpIds = deptEmployees.map(e => e.id);
     const deptSubmissions = performanceData.filter(p => deptEmpIds.includes(p.employee_id));
     
@@ -61,7 +61,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   const maxAvgRate = Math.max(...deptStats.map(d => d.avgRate), 1);
 
   // 2. ข้อมูลฝ่าย (Department View)
-  const deptEmployees = employeesData.filter(e => e.department === selectedDept);
+  const deptEmployees = employeesData.filter(e => isSameDept(e.department, selectedDept));
   const deptEmpIds = deptEmployees.map(e => e.id);
   const deptPerformance = performanceData.filter(p => deptEmpIds.includes(p.employee_id));
   
@@ -257,7 +257,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                 <tbody>
                   {deptStats.map(dept => {
                     // ดึงจำนวนสถานะ
-                    const deptEmployees = employeesData.filter(e => e.department === dept.name);
+                    const deptEmployees = employeesData.filter(e => isSameDept(e.department, dept.name));
                     const deptEmpIds = deptEmployees.map(e => e.id);
                     const deptPerfs = performanceData.filter(p => deptEmpIds.includes(p.employee_id));
                     
@@ -267,7 +267,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
 
                     return (
                       <tr key={dept.name}>
-                        <td><strong>ฝ่าย{dept.name}</strong></td>
+                        <td><strong>{formatDept(dept.name)}</strong></td>
                         <td>{dept.staffCount} คน</td>
                         <td>{dept.submissions} ชิ้นงาน</td>
                         <td>
@@ -308,7 +308,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                 onChange={(e) => setSelectedDept(e.target.value)}
               >
                 {CONFIG.DEPARTMENTS.filter(d => d !== 'ผู้บริหาร').map(d => (
-                  <option key={d} value={d}>ฝ่าย{d}</option>
+                  <option key={d} value={d}>{formatDept(d)}</option>
                 ))}
               </select>
             </div>
@@ -321,7 +321,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                 <Users size={24} />
               </div>
               <div className="stat-info">
-                <h3>พนักงานในฝ่าย{selectedDept}</h3>
+                <h3>พนักงานใน{formatDept(selectedDept)}</h3>
                 <p>{deptEmployees.length} คน</p>
               </div>
             </div>
@@ -399,7 +399,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
 
             {/* ผลงานทั้งหมดของฝ่าย */}
             <div className="card">
-              <h3 className="card-title">📁 รายงานผลงานของฝ่าย{selectedDept} ({deptPerformance.length} ชิ้นงาน)</h3>
+              <h3 className="card-title">📁 รายงานผลงานของ{formatDept(selectedDept)} ({deptPerformance.length} ชิ้นงาน)</h3>
               <div className="perf-list">
                 {deptPerformance.length === 0 ? (
                   <div style={{ textAlign: 'center', padding: '40px 20px', color: 'var(--text-muted)' }}>
@@ -496,7 +496,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                     <img src={emp.image_url} alt={emp.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} onError={(e) => e.target.src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} />
                     <div>
                       <div style={{ fontSize: '13px', fontWeight: '600', color: selectedEmpId === emp.id ? 'var(--primary-hover)' : 'var(--text-main)' }}>{emp.name}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{emp.id} • {emp.department}</div>
+                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{emp.id} • {formatDept(emp.department)}</div>
                     </div>
                   </div>
                 ))
@@ -529,7 +529,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                         </div>
                         <div className="meta-item">
                           <div className="meta-label">ฝ่าย / แผนก</div>
-                          <div className="meta-value">ฝ่าย{selectedEmployee.department}</div>
+                          <div className="meta-value">{formatDept(selectedEmployee.department)}</div>
                         </div>
                         <div className="meta-item">
                           <div className="meta-label">เลขบัตรประชาชน</div>

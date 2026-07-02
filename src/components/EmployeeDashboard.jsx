@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import PerformanceForm from './PerformanceForm';
 import ChangePasswordModal from './ChangePasswordModal';
 import { Award, Briefcase, FileText, CheckCircle2, Clock, AlertTriangle, Link as LinkIcon, Edit, LogOut, KeyRound } from 'lucide-react';
-import { CONFIG } from '../config';
+import { CONFIG, formatDept } from '../config';
 
 export default function EmployeeDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [editingPerf, setEditingPerf] = useState(null);
@@ -60,7 +60,7 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
           <div>
             <h2 style={{ fontSize: '20px', fontWeight: '700' }}>ยินดีต้อนรับคุณ {currentUser.name}</h2>
             <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
-              ตำแหน่ง {currentUser.position} • ฝ่าย{currentUser.department} • รหัสพนักงาน {currentUser.id}
+              ตำแหน่ง {currentUser.position} • {formatDept(currentUser.department)} • รหัสพนักงาน {currentUser.id}
             </p>
           </div>
         </div>

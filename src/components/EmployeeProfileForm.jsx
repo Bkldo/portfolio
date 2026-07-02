@@ -199,6 +199,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
               onChange={(e) => setRole(e.target.value)}
             >
               <option value="employee">พนักงานทั่วไป (บันทึกและดูผลงานตนเอง)</option>
+              <option value="head">หัวหน้าฝ่าย (ดูสถิติและผลงานเจ้าหน้าที่ในฝ่ายของตน)</option>
               <option value="executive">ผู้บริหาร (ดูสถิติภาพรวมและพนักงานทุกคน)</option>
               <option value="admin">ผู้ดูแลระบบ (จัดการเพิ่มรายชื่อบุคคล)</option>
             </select>
