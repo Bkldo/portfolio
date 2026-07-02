@@ -46,7 +46,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
 
     try {
       await addEmployee(employeePayload);
-      setSuccessMsg(`ลงทะเบียนพนักงาน ${name} สำเร็จแล้ว!`);
+      setSuccessMsg(`ลงทะเบียนบุคลากร ${name} สำเร็จแล้ว!`);
       // ล้างข้อมูลฟอร์ม
       setEmpId('');
       setName('');
@@ -67,7 +67,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
 
   return (
     <div className="card">
-      <h3 className="card-title">👤 ลงทะเบียนและจัดการบัญชีพนักงานใหม่</h3>
+      <h3 className="card-title">👤 ลงทะเบียนและจัดการบัญชีบุคลากรใหม่</h3>
       
       {error && (
         <div style={{
@@ -224,7 +224,7 @@ export default function EmployeeProfileForm({ onSuccess }) {
             disabled={loading}
           >
             <UserPlus size={16} />
-            {loading ? 'กำลังลงทะเบียน...' : 'ลงทะเบียนพนักงาน'}
+            {loading ? 'กำลังลงทะเบียน...' : 'ลงทะเบียนบุคลากร'}
           </button>
         </div>
       </form>
