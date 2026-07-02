@@ -212,7 +212,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                             width: '32px'
                           }}
                         >
-                          <div className="bar-tooltip">{dept.submissions} งาน</div>
+                          <div className="bar-tooltip">{dept.name}: {dept.submissions} งาน</div>
                         </div>
                         <span className="bar-label">{dept.name}</span>
                       </div>
@@ -239,7 +239,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                             width: '32px'
                           }}
                         >
-                          <div className="bar-tooltip">{dept.avgRate}%</div>
+                          <div className="bar-tooltip">{dept.name}: {dept.avgRate}%</div>
                         </div>
                         <span className="bar-label">{dept.name}</span>
                       </div>
