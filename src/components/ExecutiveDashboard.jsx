@@ -1,9 +1,11 @@
 import React, { useState } from 'react';
+import PerformanceForm from './PerformanceForm';
+import { deletePerformance } from '../utils/api';
 import {
   Users, BarChart3, TrendingUp, ShieldAlert,
   Search, FolderKanban, FileText, CheckCircle2,
   Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight, KeyRound,
-  Edit, Share2, Mail, Calendar, Building2
+  Edit, Share2, Mail, Calendar, Building2, Trash2
 } from 'lucide-react';
 import { CONFIG, formatDept, isSameDept, calcMonthComparison } from '../config';
 
@@ -15,22 +17,47 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   const [filterYear, setFilterYear] = useState('ทั้งหมด');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
 
+  // สำหรับแท็บบันทึกผลงานตนเอง
+  const [editingPerf, setEditingPerf] = useState(null);
+  const [deleteError, setDeleteError] = useState('');
+  const [myFilterYear, setMyFilterYear] = useState('ทั้งหมด');
+  const [myFilterMonth, setMyFilterMonth] = useState('ทั้งหมด');
+  const [myPageIdx, setMyPageIdx] = useState(0);
+
   const showExecInInspection = localStorage.getItem('show_exec_in_inspection') === 'true';
 
-  const isExecutiveUser = (e) => {
-    if (!e) return false;
-    const role = String(e.role || '').toLowerCase();
-    const dept = String(e.department || '').trim();
-    const pos = String(e.position || '').trim();
-    return role === 'executive' || 
-           dept === 'ผู้บริหาร' || 
-           dept.toLowerCase() === 'executive' || 
-           pos.includes('ผู้อำนวยการเขต') || 
-           pos.includes('ผู้ช่วยผู้อำนวยการ');
+  const isDirectorUser = (u) => {
+    if (!u) return false;
+    const pos = String(u.position || '').trim();
+    return !pos.includes('ผู้ช่วย') && (pos.includes('ผู้อำนวยการ') || pos.includes('ผอ.') || pos.includes('ประธาน') || pos.includes('CEO') || String(u.role).toLowerCase() === 'director');
   };
 
-  const sortHeadFirst = (list) => {
+  const isAssistantDirectorUser = (u) => {
+    if (!u) return false;
+    const pos = String(u.position || '').trim();
+    return pos.includes('ผู้ช่วยผู้อำนวยการ') || pos.includes('ผู้ช่วย ผอ.');
+  };
+
+  // เฉพาะผู้อำนวยการเขตเท่านั้น เห็นผู้ช่วยผู้อำนวยการเขต (หรือแอดมินตั้งค่าให้แสดง)
+  const canSeeEmployeeInInspection = (e) => {
+    if (isDirectorUser(e)) return false; // ไม่แสดงผู้อำนวยการเขตในรายชื่อตรวจสอบ
+    if (isAssistantDirectorUser(e)) {
+      return isDirectorUser(currentUser) || showExecInInspection; // เฉพาะผู้อำนวยการเท่านั้นที่เห็นผู้ช่วยผู้อำนวยการเขต หรือเมื่อแอดมินเปิดการแสดงผล
+    }
+    return true;
+  };
+
+  // เรียงลำดับ: 1) ผู้ช่วยผู้อำนวยการเขต (เรียงตามเลขที่ตำแหน่ง) 2) หัวหน้าฝ่าย 3) พนักงานทั่วไป
+  const sortEmployeesByRank = (list) => {
     return [...list].sort((a, b) => {
+      const aIsAsst = isAssistantDirectorUser(a);
+      const bIsAsst = isAssistantDirectorUser(b);
+      if (aIsAsst && !bIsAsst) return -1;
+      if (!aIsAsst && bIsAsst) return 1;
+      if (aIsAsst && bIsAsst) {
+        return String(a.id || '').localeCompare(String(b.id || ''), undefined, { numeric: true });
+      }
+      
       const aIsHead = String(a.role || '').toLowerCase() === 'head' || String(a.position || '').includes('หัวหน้า');
       const bIsHead = String(b.role || '').toLowerCase() === 'head' || String(b.position || '').includes('หัวหน้า');
       if (aIsHead && !bIsHead) return -1;
@@ -42,7 +69,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   // --- การคำนวณและเตรียมข้อมูลสำหรับแต่ละส่วน ---
 
   // 1. ภาพรวม (Overall)
-  const totalEmployees = employeesData.filter(e => e.role !== 'executive').length;
+  const totalEmployees = employeesData.filter(e => canSeeEmployeeInInspection(e)).length;
   const totalSubmissions = performanceData.length;
   
   const doneCount = performanceData.filter(p => p.status === 'Done').length;
@@ -64,8 +91,8 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   ).size;
 
   // กราฟ 1: เปรียบเทียบจำนวนการส่งผลงานแยกตามฝ่าย
-  const deptStats = CONFIG.DEPARTMENTS.filter(d => d !== 'ผู้บริหาร').map(dept => {
-    const deptEmployees = employeesData.filter(e => isSameDept(e.department, dept));
+  const deptStats = CONFIG.DEPARTMENTS.filter(d => isDirectorUser(currentUser) ? true : d !== 'ผู้บริหาร').map(dept => {
+    const deptEmployees = employeesData.filter(e => isSameDept(e.department, dept) && canSeeEmployeeInInspection(e));
     const deptEmpIds = deptEmployees.map(e => e.id);
     const deptSubmissions = performanceData.filter(p => deptEmpIds.includes(p.employee_id));
     
@@ -87,7 +114,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   const maxAvgRate = Math.max(...deptStats.map(d => d.avgRate), 1);
 
   // 2. ข้อมูลฝ่าย (Department View)
-  const deptEmployees = sortHeadFirst(employeesData.filter(e => isSameDept(e.department, selectedDept)));
+  const deptEmployees = sortEmployeesByRank(employeesData.filter(e => isSameDept(e.department, selectedDept) && canSeeEmployeeInInspection(e)));
   const deptEmpIds = deptEmployees.map(e => e.id);
   const deptPerformance = performanceData.filter(p => deptEmpIds.includes(p.employee_id));
   
@@ -100,12 +127,11 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
     : 0;
 
   // กรองรายชื่อพนักงานสำหรับค้นหาในโหมดรายบุคคล
-  const filteredEmployees = sortHeadFirst(employeesData.filter(e => {
+  const filteredEmployees = sortEmployeesByRank(employeesData.filter(e => {
     const matchSearch = String(e.name || '').toLowerCase().includes(searchQuery.toLowerCase()) || 
                         String(e.department || '').toLowerCase().includes(searchQuery.toLowerCase()) ||
                         String(e.id || '').toLowerCase().includes(searchQuery.toLowerCase());
-    const isExec = isExecutiveUser(e);
-    return (showExecInInspection || !isExec) && matchSearch;
+    return canSeeEmployeeInInspection(e) && matchSearch;
   }));
 
   // 3. ข้อมูลรายบุคคล (Individual View)
@@ -128,6 +154,53 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
     ? Math.round(empPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / empPerformance.length)
     : 0;
   const empComparison = calcMonthComparison(empPerformance);
+
+  // ข้อมูลผลงานของตนเอง (สำหรับแท็บบันทึกผลงานตนเอง)
+  const myYearPerf = (performanceData || []).filter(p => {
+    const isMe = p.employee_id === currentUser.id;
+    const matchYear = myFilterYear === 'ทั้งหมด' || String(p.year || '').trim() === String(myFilterYear || '').trim();
+    return isMe && matchYear;
+  });
+
+  const sortedMyPerf = [...myYearPerf].sort((a, b) => {
+    if (String(a.year) !== String(b.year)) {
+      return parseInt(b.year || 0, 10) - parseInt(a.year || 0, 10);
+    }
+    return CONFIG.MONTHS.indexOf(String(b.month || '')) - CONFIG.MONTHS.indexOf(String(a.month || ''));
+  });
+
+  const myUniqueMonthsList = [];
+  const mySeenKeys = new Set();
+  sortedMyPerf.forEach(p => {
+    const key = `${p.year}-${p.month}`;
+    if (!mySeenKeys.has(key)) {
+      mySeenKeys.add(key);
+      myUniqueMonthsList.push({ year: String(p.year || ''), month: String(p.month || ''), key });
+    }
+  });
+
+  const myTotalPages = Math.ceil(myUniqueMonthsList.length / 3) || 1;
+  const myActiveMonths = myUniqueMonthsList.slice(myPageIdx * 3, (myPageIdx + 1) * 3);
+  const myActiveMonthKeys = new Set(myActiveMonths.map(m => m.key));
+
+  const displayedMyPerformance = myFilterMonth === 'ทั้งหมด'
+    ? sortedMyPerf.filter(p => myActiveMonthKeys.has(`${p.year}-${p.month}`))
+    : sortedMyPerf.filter(p => String(p.month || '').trim() === String(myFilterMonth).trim());
+
+  const myPerformance = displayedMyPerformance;
+
+  // ฟังก์ชันลบผลงานของตนเอง
+  const handleDeleteMyPerf = async (id) => {
+    if (window.confirm('คุณต้องการลบรายงานผลงานนี้ใช่หรือไม่?')) {
+      setDeleteError('');
+      try {
+        await deletePerformance(id);
+        onRefresh();
+      } catch (err) {
+        setDeleteError(err.message || 'เกิดข้อผิดพลาดในการลบข้อมูล');
+      }
+    }
+  };
 
   return (
     <div>
@@ -160,6 +233,12 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           onClick={() => setActiveSubTab('individual')}
         >
           👤 ตรวจสอบรายบุคคล
+        </button>
+        <button
+          className={`tab-btn ${activeSubTab === 'my_perf' ? 'active' : ''}`}
+          onClick={() => setActiveSubTab('my_perf')}
+        >
+          📝 บันทึกผลงานของตนเอง
         </button>
       </div>
 
@@ -336,7 +415,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                 value={selectedDept}
                 onChange={(e) => setSelectedDept(e.target.value)}
               >
-                {CONFIG.DEPARTMENTS.filter(d => d !== 'ผู้บริหาร').map(d => (
+                {CONFIG.DEPARTMENTS.filter(d => isDirectorUser(currentUser) ? true : d !== 'ผู้บริหาร').map(d => (
                   <option key={d} value={d}>{formatDept(d)}</option>
                 ))}
               </select>
@@ -720,6 +799,171 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                 กรุณาเลือกพนักงานเพื่อดูรายละเอียดและประวัติผลงานรายเดือน
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {/* ======================================================== */}
+      {/* 4. แท็บบันทึกผลงานตนเอง (My Performance View) */}
+      {/* ======================================================== */}
+      {activeSubTab === 'my_perf' && (
+        <div>
+          {deleteError && (
+            <div style={{ backgroundColor: '#fff1f2', color: '#e11d48', border: '1px solid #ffe4e6', padding: '12px 16px', borderRadius: '8px', marginBottom: '20px' }}>
+              {deleteError}
+            </div>
+          )}
+
+          {/* ฟอร์มบันทึก / แก้ไขผลงานของตนเอง */}
+          <div style={{ marginBottom: '24px' }}>
+            <PerformanceForm
+              currentUser={currentUser}
+              editingData={editingPerf}
+              onSuccess={(msg) => {
+                setEditingPerf(null);
+                onRefresh();
+              }}
+              onCancel={() => setEditingPerf(null)}
+            />
+          </div>
+
+          {/* รายการผลงานทั้งหมดของฉัน */}
+          <div className="card">
+            <div className="card-title" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', margin: 0, paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
+              <span>📋 ประวัติรายงานผลงานของฉัน ({myYearPerf.length} รายการ)</span>
+              <div style={{ display: 'flex', gap: '10px' }}>
+                <select
+                  className="form-select"
+                  style={{ width: '100px', padding: '6px 12px' }}
+                  value={myFilterYear}
+                  onChange={(e) => { setMyFilterYear(e.target.value); setMyPageIdx(0); }}
+                >
+                  <option value="ทั้งหมด">ทุกปี</option>
+                  <option value="2026">2026</option>
+                  <option value="2025">2025</option>
+                </select>
+                <select
+                  className="form-select"
+                  style={{ width: '170px', padding: '6px 12px' }}
+                  value={myFilterMonth}
+                  onChange={(e) => { setMyFilterMonth(e.target.value); setMyPageIdx(0); }}
+                >
+                  <option value="ทั้งหมด">ล่าสุด (หน้าละ 3 เดือน)</option>
+                  {CONFIG.MONTHS.map(m => (
+                    <option key={m} value={m}>{m}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
+            <div className="perf-list" style={{ marginTop: '20px' }}>
+              {myFilterMonth === 'ทั้งหมด' && myUniqueMonthsList.length > 0 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '16px', paddingBottom: '12px', borderBottom: '1px dashed var(--border)' }}>
+                  <span style={{ fontSize: '13px', color: '#475569', fontWeight: '600' }}>
+                    📅 แสดงผล: {myActiveMonths[0]?.month} {myActiveMonths[0]?.year} {myActiveMonths.length > 1 ? `ถึง ${myActiveMonths[myActiveMonths.length - 1]?.month} ${myActiveMonths[myActiveMonths.length - 1]?.year}` : ''} ({myActiveMonths.length} เดือน)
+                  </span>
+                  {myUniqueMonthsList.length > 3 && (
+                    <span style={{ fontSize: '12px', color: 'var(--text-muted)' }}>
+                      หน้า {myPageIdx + 1} จากทั้งหมด {myTotalPages} หน้า ({myUniqueMonthsList.length} เดือน)
+                    </span>
+                  )}
+                </div>
+              )}
+              {myPerformance.length === 0 ? (
+                <div style={{ textAlign: 'center', padding: '40px', color: 'var(--text-muted)' }}>
+                  คุณยังไม่ได้บันทึกผลงานใดๆ ในระบบ
+                </div>
+              ) : (
+                myPerformance.map(perf => (
+                  <div key={perf.id} className="perf-item">
+                    <div className="perf-header">
+                      <span className="perf-time-badge" style={{ backgroundColor: '#eff6ff', color: '#1e40af', fontWeight: '700', padding: '4px 10px', borderRadius: '6px' }}>
+                        {perf.month} {perf.year}
+                      </span>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span className={`badge ${
+                          perf.status === 'Done' ? 'badge-done' : perf.status === 'In Progress' ? 'badge-progress' : 'badge-delayed'
+                        }`}>
+                          {perf.status === 'Done' ? 'เสร็จสิ้น' : perf.status === 'In Progress' ? 'กำลังดำเนินการ' : 'ล่าช้า'}
+                        </span>
+                        <button
+                          className="btn btn-secondary"
+                          style={{ padding: '4px 8px', fontSize: '12px', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          onClick={() => {
+                            setEditingPerf(perf);
+                            window.scrollTo({ top: 0, behavior: 'smooth' });
+                          }}
+                        >
+                          <Edit size={14} />
+                          แก้ไข
+                        </button>
+                        <button
+                          className="btn btn-secondary"
+                          style={{ padding: '4px 8px', fontSize: '12px', color: '#e11d48', borderColor: '#ffe4e6', display: 'flex', alignItems: 'center', gap: '4px' }}
+                          onClick={() => handleDeleteMyPerf(perf.id)}
+                        >
+                          <Trash2 size={14} />
+                          ลบ
+                        </button>
+                      </div>
+                    </div>
+                    <div className="perf-title" style={{ marginTop: '8px' }}>{perf.title}</div>
+                    <div className="perf-body">{perf.details}</div>
+                    <div className="perf-footer">
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                        <span style={{ fontSize: '13px', color: 'var(--text-muted)' }}>ความคืบหน้า:</span>
+                        <span className="completion-progress-bar">
+                          <span className="progress-fill" style={{ width: `${perf.completion_rate}%`, backgroundColor: perf.completion_rate == 100 ? '#10b981' : '#3b82f6' }}></span>
+                        </span>
+                        <strong style={{ fontSize: '13px' }}>{perf.completion_rate}%</strong>
+                      </div>
+                      {perf.ref_link && (
+                        <a href={perf.ref_link} target="_blank" rel="noopener noreferrer" className="btn btn-secondary" style={{ padding: '6px 12px', fontSize: '12px', textDecoration: 'none' }}>
+                          <LinkIcon size={14} style={{ marginRight: '4px' }} />
+                          เอกสารอ้างอิง
+                        </a>
+                      )}
+                    </div>
+                  </div>
+                ))
+              )}
+
+              {myFilterMonth === 'ทั้งหมด' && myUniqueMonthsList.length > 3 && (
+                <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginTop: '24px', paddingTop: '16px', borderTop: '1px solid var(--border)' }}>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={myPageIdx === 0}
+                    onClick={() => setMyPageIdx(Math.max(0, myPageIdx - 1))}
+                    style={{ padding: '6px 14px', fontSize: '13px', opacity: myPageIdx === 0 ? 0.5 : 1, cursor: myPageIdx === 0 ? 'not-allowed' : 'pointer' }}
+                  >
+                    &lt; ย้อนดู 3 เดือนใหม่กว่า
+                  </button>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                    {Array.from({ length: myTotalPages }, (_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setMyPageIdx(idx)}
+                        style={{
+                          width: '30px', height: '30px', borderRadius: '6px', border: '1px solid var(--border)',
+                          backgroundColor: myPageIdx === idx ? 'var(--primary)' : 'var(--card-bg)',
+                          color: myPageIdx === idx ? '#fff' : 'var(--text-main)',
+                          fontSize: '13px', fontWeight: '600', cursor: 'pointer'
+                        }}
+                      >
+                        {idx + 1}
+                      </button>
+                    ))}
+                  </div>
+                  <button
+                    className="btn btn-secondary btn-sm"
+                    disabled={myPageIdx >= myTotalPages - 1}
+                    onClick={() => setMyPageIdx(Math.min(myTotalPages - 1, myPageIdx + 1))}
+                    style={{ padding: '6px 14px', fontSize: '13px', opacity: myPageIdx >= myTotalPages - 1 ? 0.5 : 1, cursor: myPageIdx >= myTotalPages - 1 ? 'not-allowed' : 'pointer' }}
+                  >
+                    ดู 3 เดือนเก่ากว่า &gt;
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         </div>
       )}
