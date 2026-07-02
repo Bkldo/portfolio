@@ -118,7 +118,7 @@ export const addEmployee = async (employeeData) => {
   const employees = JSON.parse(localStorage.getItem(LOCAL_EMPLOYEES_KEY));
   const exists = employees.some(emp => emp.citizen_id === employeeData.citizen_id || emp.id === employeeData.id);
   if (exists) {
-    throw new Error('รหัสพนักงานหรือเลขบัตรประชาชนนี้มีอยู่ในระบบแล้ว (LocalStorage Mode)');
+    throw new Error('เลขที่ตำแหน่งหรือเลขบัตรประชาชนนี้มีอยู่ในระบบแล้ว (LocalStorage Mode)');
   }
   employees.push({
     ...employeeData,
