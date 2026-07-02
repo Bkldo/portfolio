@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   Users, BarChart3, TrendingUp, ShieldAlert,
   Search, FolderKanban, FileText, CheckCircle2,
+  Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight, KeyRound,
   Edit, Share2, Mail, Calendar, Building2
 } from 'lucide-react';
 import { CONFIG, formatDept, isSameDept, calcMonthComparison } from '../config';
