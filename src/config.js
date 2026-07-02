@@ -14,3 +14,29 @@ export const CONFIG = {
     "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"
   ]
 };
+
+// ฟังก์ชันจัดรูปแบบชื่อฝ่ายเพื่อป้องกันคำว่า "ฝ่าย" ซ้ำซ้อน (เช่น "ฝ่ายฝ่ายทะเบียน")
+export const formatDept = (dept) => {
+  if (!dept) return '-';
+  const str = String(dept).trim();
+  if (
+    str === 'ผู้บริหาร' ||
+    str === 'ทั้งหมด' ||
+    str === 'ทั้งหมดทุกฝ่าย' ||
+    str.startsWith('ฝ่าย') ||
+    str.startsWith('กอง') ||
+    str.startsWith('สำนัก') ||
+    str.startsWith('แผนก') ||
+    str.startsWith('ศูนย์')
+  ) {
+    return str;
+  }
+  return `ฝ่าย${str}`;
+};
+
+// ฟังก์ชันเปรียบเทียบชื่อฝ่ายว่าตรงกันหรือไม่ โดยตัดคำนำหน้าออกเพื่อความถูกต้อง
+export const isSameDept = (d1, d2) => {
+  if (!d1 || !d2) return false;
+  const clean = (s) => String(s).replace(/^(ฝ่าย|กอง|สำนัก|แผนก|ศูนย์)/, '').trim();
+  return clean(d1) === clean(d2) || String(d1).trim() === String(d2).trim();
+};
