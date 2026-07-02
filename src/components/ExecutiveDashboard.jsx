@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import {
   Users, BarChart3, TrendingUp, ShieldAlert,
   Search, FolderKanban, FileText, CheckCircle2,
-  Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight, KeyRound,
   Edit, Share2, Mail, Calendar, Building2
 } from 'lucide-react';
-import { CONFIG, formatDept, isSameDept } from '../config';
+import { CONFIG, formatDept, isSameDept, calcMonthComparison } from '../config';
 
 export default function ExecutiveDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [activeSubTab, setActiveSubTab] = useState('overall'); // overall, department, individual
@@ -28,6 +27,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   const avgCompletionRate = totalSubmissions > 0
     ? Math.round(performanceData.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / totalSubmissions)
     : 0;
+  const overallComparison = calcMonthComparison(performanceData);
 
   // จำนวนพนักงานที่ส่งรายงานแล้วในเดือนปัจจุบัน (เช่น กรกฎาคม 2026)
   const currentMonth = CONFIG.MONTHS[new Date().getMonth()];
@@ -89,6 +89,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
   const empAvgRate = empPerformance.length > 0
     ? Math.round(empPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / empPerformance.length)
     : 0;
+  const empComparison = calcMonthComparison(empPerformance);
 
   // กรองรายชื่อพนักงานสำหรับค้นหาในโหมดรายบุคคล
   const filteredEmployees = employeesData.filter(e => {
@@ -165,7 +166,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
               <div className="stat-card-value">{avgCompletionRate}%</div>
               <div className="stat-card-subtitle">
                 <span>ภาพรวมความสำเร็จ</span>
-                <span className="badge badge-done" style={{ padding: '2px 8px', fontSize: '11px' }}>+4% vs. เดือนที่แล้ว</span>
+                <span className={`badge ${overallComparison.badgeClass}`} style={{ padding: '2px 8px', fontSize: '11px' }}>{overallComparison.text}</span>
               </div>
               <div className="completion-progress-bar" style={{ width: '100%', height: '6px', marginTop: '10px' }}>
                 <div className="progress-fill" style={{ width: `${avgCompletionRate}%`, backgroundColor: '#10b981' }}></div>
@@ -575,7 +576,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                     <div className="stat-card-value">{empAvgRate}%</div>
                     <div className="stat-card-subtitle">
                       <span>ภาพรวม</span>
-                      <span className="badge badge-done" style={{ padding: '2px 8px', fontSize: '11px' }}>+4% vs. เดือนที่แล้ว</span>
+                      <span className={`badge ${empComparison.badgeClass}`} style={{ padding: '2px 8px', fontSize: '11px' }}>{empComparison.text}</span>
                     </div>
                     <div className="completion-progress-bar" style={{ width: '100%', height: '6px', marginTop: '10px' }}>
                       <div className="progress-fill" style={{ width: `${empAvgRate}%`, backgroundColor: '#f97316' }}></div>

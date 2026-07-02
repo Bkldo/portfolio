@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import PerformanceForm from './PerformanceForm';
 import { Award, Briefcase, FileText, CheckCircle2, Clock, AlertTriangle, Link as LinkIcon, Edit, Share2, Mail, Building2, TrendingUp } from 'lucide-react';
-import { CONFIG, formatDept } from '../config';
+import { CONFIG, formatDept, calcMonthComparison } from '../config';
 
 export default function EmployeeDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [editingPerf, setEditingPerf] = useState(null);
@@ -26,6 +26,7 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
   const avgCompletionRate = totalSubmissions > 0
     ? Math.round(myPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / totalSubmissions)
     : 0;
+  const myComparison = calcMonthComparison(myPerformance);
 
   const handleActionSuccess = (msg) => {
     setSuccessToast(msg);
@@ -115,7 +116,7 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
           <div className="stat-card-value">{avgCompletionRate}%</div>
           <div className="stat-card-subtitle">
             <span>ภาพรวม</span>
-            <span className="badge badge-done" style={{ padding: '2px 8px', fontSize: '11px' }}>+4% vs. เดือนที่แล้ว</span>
+            <span className={`badge ${myComparison.badgeClass}`} style={{ padding: '2px 8px', fontSize: '11px' }}>{myComparison.text}</span>
           </div>
           <div className="completion-progress-bar" style={{ width: '100%', height: '6px', marginTop: '10px' }}>
             <div className="progress-fill" style={{ width: `${avgCompletionRate}%`, backgroundColor: '#f97316' }}></div>

@@ -2,10 +2,9 @@ import React, { useState } from 'react';
 import {
   Users, BarChart3, TrendingUp, Search, FolderKanban,
   FileText, CheckCircle2, Clock, AlertTriangle, Link as LinkIcon,
-  LogOut, ArrowRight, KeyRound, Edit, Trash2, Award, Briefcase, Plus,
   Share2, Mail, Calendar, Building2
 } from 'lucide-react';
-import { CONFIG, formatDept, isSameDept } from '../config';
+import { CONFIG, formatDept, isSameDept, calcMonthComparison } from '../config';
 import PerformanceForm from './PerformanceForm';
 import { deletePerformance } from '../utils/api';
 
@@ -38,6 +37,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
   const deptAvgRate = deptPerformance.length > 0
     ? Math.round(deptPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / deptPerformance.length)
     : 0;
+  const deptComparison = calcMonthComparison(deptPerformance);
 
   const currentMonth = CONFIG.MONTHS[new Date().getMonth()];
   const currentYear = new Date().getFullYear().toString();
@@ -62,6 +62,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
   const empAvgRate = selectedEmpPerformance.length > 0
     ? Math.round(selectedEmpPerformance.reduce((acc, curr) => acc + parseInt(curr.completion_rate || 0, 10), 0) / selectedEmpPerformance.length)
     : 0;
+  const empComparison = calcMonthComparison(selectedEmpPerformance);
 
   // ข้อมูลผลงานของตัวหัวหน้าฝ่ายเอง (สำหรับแท็บบันทึกผลงานตนเอง)
   const myPerformance = (performanceData || []).filter(p => p.employee_id === currentUser.id);
@@ -172,7 +173,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
               <div className="stat-card-value">{deptAvgRate}%</div>
               <div className="stat-card-subtitle">
                 <span>ภาพรวมความสำเร็จ</span>
-                <span className="badge badge-done" style={{ padding: '2px 8px', fontSize: '11px' }}>+4% vs. เดือนที่แล้ว</span>
+                <span className={`badge ${deptComparison.badgeClass}`} style={{ padding: '2px 8px', fontSize: '11px' }}>{deptComparison.text}</span>
               </div>
               <div className="completion-progress-bar" style={{ width: '100%', height: '6px', marginTop: '10px' }}>
                 <div className="progress-fill" style={{ width: `${deptAvgRate}%`, backgroundColor: '#10b981' }}></div>
@@ -481,7 +482,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
                   <div className="stat-card-value">{empAvgRate}%</div>
                   <div className="stat-card-subtitle">
                     <span>ภาพรวม</span>
-                    <span className="badge badge-done" style={{ padding: '2px 8px', fontSize: '11px' }}>+4% vs. เดือนที่แล้ว</span>
+                    <span className={`badge ${empComparison.badgeClass}`} style={{ padding: '2px 8px', fontSize: '11px' }}>{empComparison.text}</span>
                   </div>
                   <div className="completion-progress-bar" style={{ width: '100%', height: '6px', marginTop: '10px' }}>
                     <div className="progress-fill" style={{ width: `${empAvgRate}%`, backgroundColor: '#f97316' }}></div>
