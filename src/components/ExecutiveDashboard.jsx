@@ -6,14 +6,12 @@ import {
   Edit, Share2, Mail, Calendar, Building2
 } from 'lucide-react';
 import { CONFIG, formatDept, isSameDept } from '../config';
-import ChangePasswordModal from './ChangePasswordModal';
 
 export default function ExecutiveDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [activeSubTab, setActiveSubTab] = useState('overall'); // overall, department, individual
   const [selectedDept, setSelectedDept] = useState(CONFIG.DEPARTMENTS[1]); // ไอที เป็นดีฟอลต์
   const [selectedEmpId, setSelectedEmpId] = useState(employeesData[1]?.id || ''); // พนักงานคนแรกที่ไม่ใช่ CEO เป็นดีฟอลต์
   const [searchQuery, setSearchQuery] = useState('');
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [filterYear, setFilterYear] = useState('ทั้งหมด');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
 
@@ -109,16 +107,6 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           <p style={{ color: 'var(--text-muted)', fontSize: '14px' }}>
             ดูภาพรวมผลการดำเนินงานของพนักงานทุกฝ่ายในองค์กรย้อนหลังและข้อมูลการปฏิบัติงานจริง
           </p>
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-secondary" onClick={() => setShowPasswordModal(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <KeyRound size={16} style={{ color: 'var(--primary)' }} />
-            เปลี่ยนรหัสผ่าน
-          </button>
-          <button className="btn btn-secondary" onClick={onLogout} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <LogOut size={16} />
-            ออกจากระบบ
-          </button>
         </div>
       </div>
 
@@ -697,13 +685,6 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           </div>
         </div>
       )}
-
-      <ChangePasswordModal
-        isOpen={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        currentUser={currentUser}
-        onSuccess={onRefresh}
-      />
     </div>
   );
 }

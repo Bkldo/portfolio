@@ -6,14 +6,12 @@ import {
   Share2, Mail, Calendar, Building2
 } from 'lucide-react';
 import { CONFIG, formatDept, isSameDept } from '../config';
-import ChangePasswordModal from './ChangePasswordModal';
 import PerformanceForm from './PerformanceForm';
 import { deletePerformance } from '../utils/api';
 
 export default function DepartmentHeadDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview'); // overview, individual, my_perf
   const [searchQuery, setSearchQuery] = useState('');
-  const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [editingPerf, setEditingPerf] = useState(null);
   const [successToast, setSuccessToast] = useState('');
   const [deleteError, setDeleteError] = useState('');
@@ -113,16 +111,6 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
               ตำแหน่ง {currentUser.position} • {formatDept(currentUser.department)} • รหัสพนักงาน {currentUser.id}
             </p>
           </div>
-        </div>
-        <div style={{ display: 'flex', gap: '10px' }}>
-          <button className="btn btn-secondary" onClick={() => setShowPasswordModal(true)} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <KeyRound size={16} style={{ color: 'var(--primary)' }} />
-            เปลี่ยนรหัสผ่าน
-          </button>
-          <button className="btn btn-secondary" onClick={onLogout} style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
-            <LogOut size={16} />
-            ออกจากระบบ
-          </button>
         </div>
       </div>
 
@@ -697,13 +685,6 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
         </div>
       )}
 
-      {/* โมดัลเปลี่ยนรหัสผ่าน */}
-      <ChangePasswordModal
-        isOpen={showPasswordModal}
-        onClose={() => setShowPasswordModal(false)}
-        currentUser={currentUser}
-        onSuccess={() => {}}
-      />
     </div>
   );
 }
