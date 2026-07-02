@@ -792,6 +792,212 @@ body {
   to { transform: scale(1); opacity: 1; }
 }
 
+/* ==========================================================================
+    Performance Insights Theme & UI Components (Restrained & Premium)
+   ========================================================================== */
+
+/* Search input in Navbar or Filters (Pill shape) */
+.search-pill-input {
+  border-radius: 30px !important;
+  padding: 8px 16px 8px 38px !important;
+  background-color: #f8fafc !important;
+  border: 1px solid #cbd5e1 !important;
+  font-size: 13px !important;
+  transition: all 0.2s ease;
+}
+.search-pill-input:focus {
+  background-color: #ffffff !important;
+  border-color: var(--primary) !important;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1) !important;
+}
+
+/* Pill Action Buttons in Navbar */
+.btn-pill {
+  border-radius: 30px !important;
+  padding: 8px 18px !important;
+  font-weight: 600 !important;
+  font-size: 13px !important;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+.btn-pill-dark {
+  background-color: #0f172a !important;
+  color: #ffffff !important;
+  border: 1px solid #0f172a !important;
+}
+.btn-pill-dark:hover {
+  background-color: #1e293b !important;
+}
+.btn-pill-outline {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  border: 1px solid #cbd5e1 !important;
+}
+.btn-pill-outline:hover {
+  background-color: #f8fafc !important;
+  border-color: #94a3b8 !important;
+}
+
+/* Stat card with left accent border (Performance Insights Style) */
+.stat-card-left-border {
+  background-color: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  padding: 20px 22px;
+  box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05);
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  position: relative;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  border-left: 4px solid var(--primary);
+}
+.stat-card-left-border:hover {
+  box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.08), 0 2px 4px -2px rgb(0 0 0 / 0.05);
+  border-color: var(--border-focus);
+}
+.stat-card-left-border.accent-blue { border-left-color: #334155; }
+.stat-card-left-border.accent-green { border-left-color: #10b981; }
+.stat-card-left-border.accent-purple { border-left-color: #6366f1; }
+.stat-card-left-border.accent-orange { border-left-color: #f97316; }
+
+.stat-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+.stat-card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: #475569;
+}
+.stat-card-icon-sm {
+  width: 32px;
+  height: 32px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+}
+.stat-card-value {
+  font-size: 32px;
+  font-weight: 700;
+  color: #0f172a;
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.stat-card-subtitle {
+  font-size: 12px;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+}
+
+/* Employee selection sidebar list item */
+.emp-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  margin-bottom: 8px;
+  border: 1px solid transparent;
+}
+.emp-sidebar-item.active {
+  background: linear-gradient(135deg, #6366f1 0%, #4f46e5 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.25);
+}
+.emp-sidebar-item.inactive {
+  background-color: transparent;
+  color: #1e293b;
+}
+.emp-sidebar-item.inactive:hover {
+  background-color: #f1f5f9;
+}
+
+/* Profile card avatar ring with badge */
+.profile-avatar-wrapper {
+  position: relative;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.profile-avatar-ring {
+  width: 110px;
+  height: 110px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #ffffff;
+  outline: 2px solid #e0e7ff;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+}
+.profile-avatar-badge {
+  position: absolute;
+  bottom: 4px;
+  right: 4px;
+  width: 26px;
+  height: 26px;
+  background-color: #4f46e5;
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid white;
+  font-size: 12px;
+}
+
+/* Timeline performance history */
+.timeline-container {
+  position: relative;
+  padding-left: 28px;
+  margin-top: 16px;
+}
+.timeline-container::before {
+  content: '';
+  position: absolute;
+  left: 9px;
+  top: 10px;
+  bottom: 10px;
+  width: 2px;
+  background-color: #e2e8f0;
+}
+.timeline-item {
+  position: relative;
+  background-color: #ffffff;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+  padding: 18px 20px;
+  margin-bottom: 16px;
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+.timeline-item:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+.timeline-node {
+  position: absolute;
+  left: -28px;
+  top: 22px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background-color: #ffffff;
+  border: 3px solid #10b981;
+  z-index: 2;
+}
+.timeline-node.progress { border-color: #6366f1; }
+.timeline-node.delayed { border-color: #f43f5e; }
+
 /* ปรับปรุงการตอบสนองตามขนาดหน้าจอ (Responsive Responsive layout) */
 @media (max-width: 768px) {
   .employee-detail-card {

@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import {
   Users, BarChart3, TrendingUp, ShieldAlert,
   Search, FolderKanban, FileText, CheckCircle2,
-  Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight, KeyRound
+  Clock, AlertTriangle, Link as LinkIcon, LogOut, ArrowRight, KeyRound,
+  Edit, Share2, Mail, Calendar, Building2
 } from 'lucide-react';
 import { CONFIG, formatDept, isSameDept } from '../config';
 import ChangePasswordModal from './ChangePasswordModal';
@@ -143,44 +144,46 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
         <div>
           {/* แผงแสดงตัวเลขสำคัญ */}
           <div className="stats-grid">
-            <div className="stat-card">
-              <div className="stat-icon-wrapper" style={{ backgroundColor: '#eff6ff', color: '#3b82f6' }}>
-                <Users size={24} />
+            <div className="stat-card-left-border accent-blue">
+              <div className="stat-card-header">
+                <span className="stat-card-title">พนักงานทั้งหมด</span>
+                <div className="stat-card-icon-sm" style={{ backgroundColor: '#eff6ff', color: '#3b82f6' }}><Users size={18} /></div>
               </div>
-              <div className="stat-info">
-                <h3>พนักงานทั้งหมด</h3>
-                <p>{totalEmployees} คน</p>
+              <div className="stat-card-value">{totalEmployees}</div>
+              <div className="stat-card-subtitle"><span>บุคลากรในระบบ</span><span>คน</span></div>
+            </div>
+
+            <div className="stat-card-left-border accent-purple">
+              <div className="stat-card-header">
+                <span className="stat-card-title">รายงานผลงานรวม</span>
+                <div className="stat-card-icon-sm" style={{ backgroundColor: '#faf5ff', color: '#a855f7' }}><FileText size={18} /></div>
+              </div>
+              <div className="stat-card-value">{totalSubmissions}</div>
+              <div className="stat-card-subtitle"><span>รายการสะสม</span><span>ครั้ง</span></div>
+            </div>
+
+            <div className="stat-card-left-border accent-green">
+              <div className="stat-card-header">
+                <span className="stat-card-title">ความคืบหน้าเฉลี่ย</span>
+                <div className="stat-card-icon-sm" style={{ backgroundColor: '#ecfdf5', color: '#10b981' }}><CheckCircle2 size={18} /></div>
+              </div>
+              <div className="stat-card-value">{avgCompletionRate}%</div>
+              <div className="stat-card-subtitle">
+                <span>ภาพรวมความสำเร็จ</span>
+                <span className="badge badge-done" style={{ padding: '2px 8px', fontSize: '11px' }}>+4% vs. เดือนที่แล้ว</span>
+              </div>
+              <div className="completion-progress-bar" style={{ width: '100%', height: '6px', marginTop: '10px' }}>
+                <div className="progress-fill" style={{ width: `${avgCompletionRate}%`, backgroundColor: '#10b981' }}></div>
               </div>
             </div>
 
-            <div className="stat-card">
-              <div className="stat-icon-wrapper" style={{ backgroundColor: '#faf5ff', color: '#a855f7' }}>
-                <FileText size={24} />
+            <div className="stat-card-left-border accent-orange">
+              <div className="stat-card-header">
+                <span className="stat-card-title">ส่งงานเดือน{currentMonth}</span>
+                <div className="stat-card-icon-sm" style={{ backgroundColor: '#ffedd5', color: '#f97316' }}><TrendingUp size={18} /></div>
               </div>
-              <div className="stat-info">
-                <h3>รายงานผลงานรวม</h3>
-                <p>{totalSubmissions} ครั้ง</p>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon-wrapper" style={{ backgroundColor: 'var(--status-done-bg)', color: 'var(--status-done)' }}>
-                <CheckCircle2 size={24} />
-              </div>
-              <div className="stat-info">
-                <h3>ความคืบหน้าเฉลี่ย</h3>
-                <p>{avgCompletionRate}%</p>
-              </div>
-            </div>
-
-            <div className="stat-card">
-              <div className="stat-icon-wrapper" style={{ backgroundColor: '#f0fdf4', color: '#16a34a' }}>
-                <TrendingUp size={24} />
-              </div>
-              <div className="stat-info">
-                <h3>ส่งผลงานในเดือนนี้ ({currentMonth})</h3>
-                <p>{submittedThisMonth} / {totalEmployees} คน</p>
-              </div>
+              <div className="stat-card-value">{submittedThisMonth}</div>
+              <div className="stat-card-subtitle"><span>จากทั้งหมด {totalEmployees} คน</span><span>{Math.round((submittedThisMonth / (totalEmployees || 1)) * 100)}%</span></div>
             </div>
           </div>
 
@@ -458,21 +461,23 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
       {activeSubTab === 'individual' && (
         <div style={{ display: 'grid', gridTemplateColumns: '320px 1fr', gap: '24px', alignItems: 'start' }}>
           {/* ตัวเลือกและแถบค้นหาพนักงาน */}
-          <div className="card">
-            <h3 className="card-title">🔎 ค้นหาบุคลากร</h3>
-            <div className="form-group" style={{ position: 'relative' }}>
-              <Search size={16} style={{ position: 'absolute', left: '12px', top: '13px', color: 'var(--text-light)' }} />
+          <div className="card" style={{ padding: '20px' }}>
+            <div style={{ marginBottom: '16px' }}>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '2px' }}>รายชื่อพนักงาน</h3>
+              <p style={{ fontSize: '12px', color: '#64748b' }}>รายชื่อทั้งหมดในองค์กร ({filteredEmployees.length} คน)</p>
+            </div>
+            <div className="form-group" style={{ position: 'relative', marginBottom: '16px' }}>
+              <Search size={16} style={{ position: 'absolute', left: '14px', top: '11px', color: '#94a3b8' }} />
               <input
                 type="text"
-                className="form-input"
-                style={{ paddingLeft: '36px' }}
-                placeholder="ชื่อ รหัสพนักงาน หรือฝ่ายงาน..."
+                className="form-input search-pill-input"
+                placeholder="ค้นหาพนักงาน..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '8px', maxHeight: '400px', overflowY: 'auto', marginTop: '16px' }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '4px', maxHeight: '500px', overflowY: 'auto' }}>
               {filteredEmployees.length === 0 ? (
                 <p style={{ color: 'var(--text-muted)', fontSize: '13px', textAlign: 'center', padding: '20px' }}>ไม่พบข้อมูล</p>
               ) : (
@@ -480,24 +485,14 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                   <div
                     key={emp.id}
                     onClick={() => setSelectedEmpId(emp.id)}
-                    style={{
-                      display: 'flex',
-                      alignItems: 'center',
-                      gap: '10px',
-                      padding: '8px 12px',
-                      borderRadius: 'var(--radius-sm)',
-                      border: `1px solid ${selectedEmpId === emp.id ? 'var(--primary)' : 'var(--border)'}`,
-                      backgroundColor: selectedEmpId === emp.id ? 'var(--primary-light)' : 'transparent',
-                      cursor: 'pointer',
-                      transition: 'all 0.2s',
-                      textAlign: 'left'
-                    }}
+                    className={`emp-sidebar-item ${selectedEmpId === emp.id ? 'active' : 'inactive'}`}
                   >
-                    <img src={emp.image_url} alt={emp.name} style={{ width: '32px', height: '32px', borderRadius: '50%', objectFit: 'cover' }} onError={(e) => e.target.src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} />
-                    <div>
-                      <div style={{ fontSize: '13px', fontWeight: '600', color: selectedEmpId === emp.id ? 'var(--primary-hover)' : 'var(--text-main)' }}>{emp.name}</div>
-                      <div style={{ fontSize: '11px', color: 'var(--text-muted)' }}>{emp.id} • {formatDept(emp.department)}</div>
+                    <img src={emp.image_url} alt={emp.name} style={{ width: '40px', height: '40px', borderRadius: '50%', objectFit: 'cover', border: '2px solid rgba(255,255,255,0.3)' }} onError={(e) => e.target.src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"} />
+                    <div style={{ overflow: 'hidden', flex: 1, textAlign: 'left' }}>
+                      <div style={{ fontSize: '14px', fontWeight: '600', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{emp.name}</div>
+                      <div style={{ fontSize: '11px', opacity: selectedEmpId === emp.id ? 0.9 : 0.6, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{emp.position || formatDept(emp.department)}</div>
                     </div>
+                    <ArrowRight size={16} style={{ opacity: selectedEmpId === emp.id ? 1 : 0.3 }} />
                   </div>
                 ))
               )}
@@ -508,114 +503,150 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
           <div>
             {selectedEmployee ? (
               <div>
-                {/* ข้อมูลโปรไฟล์พนักงาน */}
-                <div className="card" style={{ marginBottom: '24px' }}>
-                  <div className="employee-detail-card">
-                    <img
-                      src={selectedEmployee.image_url}
-                      alt={selectedEmployee.name}
-                      className="employee-large-avatar"
-                      onError={(e) => e.target.src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"}
-                    />
-                    <div style={{ textAlign: 'left' }}>
-                      <span className="badge badge-progress" style={{ marginBottom: '10px' }}>พนักงานระดับทดสอบ</span>
-                      <h2 style={{ fontSize: '22px', fontWeight: '700', marginBottom: '8px' }}>{selectedEmployee.name}</h2>
-                      <p style={{ color: 'var(--text-muted)', marginBottom: '20px' }}>ตำแหน่ง: {selectedEmployee.position}</p>
-                      
-                      <div className="employee-meta-info">
-                        <div className="meta-item">
-                          <div className="meta-label">รหัสพนักงาน</div>
-                          <div className="meta-value">{selectedEmployee.id}</div>
+                {/* ข้อมูลโปรไฟล์พนักงาน (Performance Insights Style) */}
+                <div className="card" style={{ marginBottom: '24px', padding: '24px' }}>
+                  <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', justifyContent: 'space-between', gap: '20px' }}>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '24px' }}>
+                      <div className="profile-avatar-wrapper">
+                        <img
+                          src={selectedEmployee.image_url}
+                          alt={selectedEmployee.name}
+                          className="profile-avatar-ring"
+                          onError={(e) => e.target.src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=150"}
+                        />
+                        <div className="profile-avatar-badge">★</div>
+                      </div>
+                      <div style={{ textAlign: 'left' }}>
+                        <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flexWrap: 'wrap', marginBottom: '6px' }}>
+                          <h2 style={{ fontSize: '24px', fontWeight: '700', color: '#0f172a', margin: 0 }}>{selectedEmployee.name}</h2>
+                          <span style={{ backgroundColor: '#e0e7ff', color: '#4338ca', fontSize: '12px', fontWeight: '600', padding: '3px 12px', borderRadius: '20px' }}>
+                            {selectedEmployee.position || formatDept(selectedEmployee.department)}
+                          </span>
                         </div>
-                        <div className="meta-item">
-                          <div className="meta-label">ฝ่าย / แผนก</div>
-                          <div className="meta-value">{formatDept(selectedEmployee.department)}</div>
-                        </div>
-                        <div className="meta-item">
-                          <div className="meta-label">เลขบัตรประชาชน</div>
-                          <div className="meta-value" style={{ fontFamily: 'monospace', letterSpacing: '1px' }}>{selectedEmployee.citizen_id || '-'}</div>
+                        <p style={{ color: '#475569', fontSize: '14px', marginBottom: '12px', maxWidth: '500px' }}>
+                          รับผิดชอบการปฏิบัติงานด้าน{selectedEmployee.position} และการบริหารจัดการงานใน{formatDept(selectedEmployee.department)}
+                        </p>
+                        <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px', fontSize: '13px', color: '#64748b' }}>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Mail size={14} style={{ color: '#94a3b8' }} />
+                            {selectedEmployee.id.toLowerCase()}@performance.com
+                          </span>
+                          <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
+                            <Building2 size={14} style={{ color: '#94a3b8' }} />
+                            {formatDept(selectedEmployee.department)} (รหัส {selectedEmployee.id})
+                          </span>
                         </div>
                       </div>
                     </div>
+
+                    <div style={{ display: 'flex', gap: '8px' }}>
+                      <button className="btn btn-secondary btn-sm" style={{ padding: '8px', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="แก้ไขข้อมูล">
+                        <Edit size={16} />
+                      </button>
+                      <button className="btn btn-secondary btn-sm" style={{ padding: '8px', borderRadius: '50%', width: '36px', height: '36px', display: 'flex', alignItems: 'center', justifyContent: 'center' }} title="แชร์โปรไฟล์">
+                        <Share2 size={16} />
+                      </button>
+                    </div>
                   </div>
                 </div>
 
-                {/* สถิติสรุปรายบุคคล */}
+                {/* สถิติสรุปรายบุคคล (4 Left-Bordered Cards) */}
                 <div className="stats-grid">
-                  <div className="stat-card">
-                    <div className="stat-icon-wrapper" style={{ backgroundColor: 'var(--primary-light)', color: 'var(--primary)' }}>
-                      <FileText size={24} />
+                  <div className="stat-card-left-border accent-blue">
+                    <div className="stat-card-header">
+                      <span className="stat-card-title">งานทั้งหมด</span>
+                      <div className="stat-card-icon-sm" style={{ backgroundColor: '#eff6ff', color: '#3b82f6' }}><FileText size={18} /></div>
                     </div>
-                    <div className="stat-info">
-                      <h3>รายงานทั้งหมด</h3>
-                      <p>{empPerformance.length} ครั้ง</p>
-                    </div>
+                    <div className="stat-card-value">{empPerformance.length}</div>
+                    <div className="stat-card-subtitle"><span>รายการสะสม</span><span>งาน</span></div>
                   </div>
 
-                  <div className="stat-card">
-                    <div className="stat-icon-wrapper" style={{ backgroundColor: 'var(--status-done-bg)', color: 'var(--status-done)' }}>
-                      <CheckCircle2 size={24} />
+                  <div className="stat-card-left-border accent-green">
+                    <div className="stat-card-header">
+                      <span className="stat-card-title">เสร็จสมบูรณ์</span>
+                      <div className="stat-card-icon-sm" style={{ backgroundColor: '#ecfdf5', color: '#10b981' }}><CheckCircle2 size={18} /></div>
                     </div>
-                    <div className="stat-info">
-                      <h3>ความสำเร็จเฉลี่ย</h3>
-                      <p>{empAvgRate}%</p>
-                    </div>
+                    <div className="stat-card-value">{empPerformance.filter(p => p.status === 'Done').length}</div>
+                    <div className="stat-card-subtitle"><span>ความสำเร็จ</span><span>{empAvgRate}%</span></div>
                   </div>
 
-                  <div className="stat-card">
-                    <div className="stat-icon-wrapper" style={{ backgroundColor: 'var(--status-progress-bg)', color: 'var(--status-progress)' }}>
-                      <Clock size={24} />
+                  <div className="stat-card-left-border accent-purple">
+                    <div className="stat-card-header">
+                      <span className="stat-card-title">กำลังดำเนินการ</span>
+                      <div className="stat-card-icon-sm" style={{ backgroundColor: '#faf5ff', color: '#a855f7' }}><Clock size={18} /></div>
                     </div>
-                    <div className="stat-info">
-                      <h3>กำลังดำเนินการ</h3>
-                      <p>{empProgress} งาน</p>
-                    </div>
+                    <div className="stat-card-value">{empProgress}</div>
+                    <div className="stat-card-subtitle"><span>รอดำเนินการต่อ</span><span>งาน</span></div>
                   </div>
 
-                  <div className="stat-card">
-                    <div className="stat-icon-wrapper" style={{ backgroundColor: 'var(--status-delayed-bg)', color: 'var(--status-delayed)' }}>
-                      <AlertTriangle size={24} />
+                  <div className="stat-card-left-border accent-orange">
+                    <div className="stat-card-header">
+                      <span className="stat-card-title">ความก้าวหน้าเฉลี่ย</span>
+                      <div className="stat-card-icon-sm" style={{ backgroundColor: '#ffedd5', color: '#f97316' }}><TrendingUp size={18} /></div>
                     </div>
-                    <div className="stat-info">
-                      <h3>ล่าช้ากว่ากำหนด</h3>
-                      <p>{empDelayed} งาน</p>
+                    <div className="stat-card-value">{empAvgRate}%</div>
+                    <div className="stat-card-subtitle">
+                      <span>ภาพรวม</span>
+                      <span className="badge badge-done" style={{ padding: '2px 8px', fontSize: '11px' }}>+4% vs. เดือนที่แล้ว</span>
+                    </div>
+                    <div className="completion-progress-bar" style={{ width: '100%', height: '6px', marginTop: '10px' }}>
+                      <div className="progress-fill" style={{ width: `${empAvgRate}%`, backgroundColor: '#f97316' }}></div>
                     </div>
                   </div>
                 </div>
 
-                {/* รายการประวัติผลงานรายเดือน */}
-                <div className="card">
-                  <h3 className="card-title">📅 ประวัติรายงานผลงานรายเดือน ({empPerformance.length} งาน)</h3>
-                  <div className="perf-list">
+                {/* รายการประวัติผลงานรายเดือน (Timeline View) */}
+                <div className="card" style={{ padding: '24px' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '20px', paddingBottom: '12px', borderBottom: '1px solid #f1f5f9' }}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', display: 'flex', alignItems: 'center', gap: '8px', margin: 0 }}>
+                      <Clock size={18} style={{ color: '#6366f1' }} />
+                      <span>ประวัติการทำงาน (Performance History)</span>
+                    </h3>
+                    <span style={{ fontSize: '13px', color: '#4f46e5', fontWeight: '600', cursor: 'pointer' }}>ดูทั้งหมด</span>
+                  </div>
+
+                  <div className="timeline-container">
                     {empPerformance.length === 0 ? (
                       <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>
                         ยังไม่มีข้อมูลบันทึกรายงานผลงานในระบบของพนักงานผู้นี้
                       </div>
                     ) : (
                       empPerformance.map(perf => (
-                        <div key={perf.id} className="perf-item">
-                          <div className="perf-header">
+                        <div key={perf.id} className="timeline-item">
+                          <div className={`timeline-node ${perf.status === 'Done' ? '' : perf.status === 'In Progress' ? 'progress' : 'delayed'}`}></div>
+                          <div className="perf-header" style={{ marginBottom: '8px' }}>
                             <div>
-                              <span className="perf-time-badge">{perf.month} {perf.year}</span>
-                              <h4 className="perf-title" style={{ marginTop: '8px' }}>{perf.title}</h4>
+                              <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#0f172a', margin: 0 }}>{perf.title}</h4>
+                              <p style={{ fontSize: '13px', color: '#475569', marginTop: '4px', marginBottom: 0 }}>{perf.details}</p>
                             </div>
-                            <span className={`badge ${
-                              perf.status === 'Done' ? 'badge-done' :
-                              perf.status === 'In Progress' ? 'badge-progress' : 'badge-delayed'
-                            }`}>
-                              {perf.status === 'Done' ? 'Done' :
-                               perf.status === 'In Progress' ? 'In Progress' : 'Delayed'}
-                            </span>
+                            <div style={{ textAlign: 'right', flexShrink: 0, marginLeft: '16px' }}>
+                              <span className={`badge ${
+                                perf.status === 'Done' ? 'badge-done' :
+                                perf.status === 'In Progress' ? 'badge-progress' : 'badge-delayed'
+                              }`} style={{ fontWeight: '600', padding: '4px 12px' }}>
+                                {perf.status === 'Done' ? 'สำเร็จแล้ว' :
+                                 perf.status === 'In Progress' ? 'กำลังดำเนินการ' : 'ล่าช้า'}
+                              </span>
+                              <div style={{ fontSize: '11px', color: '#94a3b8', marginTop: '4px' }}>
+                                {perf.month} {perf.year}
+                              </div>
+                            </div>
                           </div>
 
-                          <p className="perf-body">{perf.details}</p>
-
-                          <div className="perf-footer">
-                            <div>
-                              <span className="completion-progress-bar" style={{ width: '100px' }}>
-                                <span className="progress-fill" style={{ width: `${perf.completion_rate}%` }}></span>
-                              </span>
-                              <span style={{ fontWeight: '600' }}>{perf.completion_rate}% ความคืบหน้า</span>
+                          <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '16px', paddingTop: '12px', borderTop: '1px dashed #e2e8f0' }}>
+                            <div style={{ display: 'flex', alignItems: 'center', gap: '12px', flex: 1, marginRight: '16px' }}>
+                              <span style={{ fontSize: '12px', color: '#64748b', fontWeight: '500' }}>ความคืบหน้า</span>
+                              <div className="completion-progress-bar" style={{ flex: 1, maxWidth: '280px', height: '8px', margin: 0, backgroundColor: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                <div
+                                  className="progress-fill"
+                                  style={{
+                                    width: `${perf.completion_rate}%`,
+                                    backgroundColor: perf.status === 'Done' ? '#10b981' : perf.status === 'In Progress' ? '#6366f1' : '#f59e0b',
+                                    borderRadius: '4px'
+                                  }}
+                                ></div>
+                              </div>
+                              <span style={{ fontSize: '13px', fontWeight: '700', color: '#0f172a' }}>{perf.completion_rate}%</span>
                             </div>
 
                             {perf.ref_link && (
@@ -623,10 +654,10 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                                 href={perf.ref_link}
                                 target="_blank"
                                 rel="noreferrer"
-                                style={{ color: 'var(--primary)', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px' }}
+                                style={{ color: '#4f46e5', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '4px', fontSize: '12px', fontWeight: '500' }}
                               >
                                 <LinkIcon size={14} />
-                                ดูไฟล์แนบอ้างอิง
+                                ดูไฟล์อ้างอิง
                               </a>
                             )}
                           </div>

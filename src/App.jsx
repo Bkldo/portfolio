@@ -62,8 +62,8 @@ export default function App() {
                 <Briefcase size={20} />
               </div>
               <div className="brand-title">
-                <h1>ระบบรายงานผลงานรายบุคคล</h1>
-                <p>Company Performance & Portfolio System</p>
+                <h1 style={{ fontSize: '20px', letterSpacing: '-0.3px', color: '#0f172a' }}>Performance Insights</h1>
+                <p style={{ fontSize: '12px', color: '#64748b' }}>ระบบบริหารจัดการและติดตามผลงาน</p>
               </div>
             </div>
 
