@@ -20,6 +20,8 @@ export default function AdminDashboard({ currentUser, performanceData, employees
   const [statsDept, setStatsDept] = useState(CONFIG.DEPARTMENTS[1]);
   const [selectedEmpId, setSelectedEmpId] = useState(employeesData.find(e => e.role !== 'admin' && e.role !== 'executive')?.id || '');
   const [empSearchQuery, setEmpSearchQuery] = useState('');
+  const [filterYear, setFilterYear] = useState('ทั้งหมด');
+  const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
 
   // ===== สถิติบุคลากร =====
   const totalUsers = employeesData.length;
@@ -69,7 +71,12 @@ export default function AdminDashboard({ currentUser, performanceData, employees
 
   // ข้อมูลรายบุคคล
   const selectedEmployee = employeesData.find(e => e.id === selectedEmpId);
-  const empPerformance = perfData.filter(p => p.employee_id === selectedEmpId);
+  const empPerformance = perfData.filter(p => {
+    if (p.employee_id !== selectedEmpId) return false;
+    if (filterYear !== 'ทั้งหมด' && String(p.year || '').trim() !== String(filterYear)) return false;
+    if (filterMonth !== 'ทั้งหมด' && String(p.month || '').trim() !== String(filterMonth)) return false;
+    return true;
+  });
   const empDone = empPerformance.filter(p => p.status === 'Done').length;
   const empProgress = empPerformance.filter(p => p.status === 'In Progress').length;
   const empDelayed = empPerformance.filter(p => p.status === 'Delayed').length;
@@ -341,7 +348,32 @@ export default function AdminDashboard({ currentUser, performanceData, employees
                       <div className="stat-card" style={{ borderLeft: '4px solid #3b82f6' }}><div className="stat-label">📈 ความคืบหน้าเฉลี่ย</div><div className="stat-value" style={{ color: '#3b82f6' }}>{empAvgRate}%</div></div>
                     </div>
                     <div className="card" style={{ marginTop: '16px' }}>
-                      <h4 style={{ fontSize: '15px', fontWeight: '700', marginBottom: '12px' }}>📝 ประวัติผลงาน ({empPerformance.length} รายการ)</h4>
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px' }}>
+                        <h4 style={{ fontSize: '15px', fontWeight: '700', margin: 0 }}>📝 ประวัติผลงาน ({empPerformance.length} รายการ)</h4>
+                        <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                          <select
+                            className="form-select"
+                            style={{ padding: '4px 10px', fontSize: '13px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none' }}
+                            value={filterYear}
+                            onChange={(e) => setFilterYear(e.target.value)}
+                          >
+                            <option value="ทั้งหมด">ทุกปี</option>
+                            <option value="2026">2026</option>
+                            <option value="2025">2025</option>
+                          </select>
+                          <select
+                            className="form-select"
+                            style={{ padding: '4px 10px', fontSize: '13px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none' }}
+                            value={filterMonth}
+                            onChange={(e) => setFilterMonth(e.target.value)}
+                          >
+                            <option value="ทั้งหมด">ทุกเดือน</option>
+                            {CONFIG.MONTHS.map(m => (
+                              <option key={m} value={m}>{m}</option>
+                            ))}
+                          </select>
+                        </div>
+                      </div>
                       {empPerformance.length === 0 ? (
                         <div style={{ textAlign: 'center', padding: '30px', color: 'var(--text-muted)' }}>ยังไม่มีผลงาน</div>
                       ) : (

@@ -8,13 +8,13 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
   const [editingPerf, setEditingPerf] = useState(null);
   const [showPasswordModal, setShowPasswordModal] = useState(false);
   const [successToast, setSuccessToast] = useState('');
-  const [filterYear, setFilterYear] = useState('2026');
+  const [filterYear, setFilterYear] = useState('ทั้งหมด');
   const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
 
   // กรองผลงานเฉพาะของตัวเองตามปีและเดือนที่เลือก
   const myPerformance = performanceData.filter(perf => {
     const isMe = String(perf?.employee_id || '').trim() === String(currentUser?.id || '').trim();
-    const matchYear = String(perf?.year || '').trim() === String(filterYear || '').trim();
+    const matchYear = filterYear === 'ทั้งหมด' || String(perf?.year || '').trim() === String(filterYear || '').trim();
     const matchMonth = filterMonth === 'ทั้งหมด' || String(perf?.month || '').trim() === String(filterMonth || '').trim();
     return isMe && matchYear && matchMonth;
   });
@@ -69,17 +69,10 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
                   {currentUser.position || formatDept(currentUser.department)}
                 </span>
               </div>
-              <p style={{ color: '#475569', fontSize: '14px', marginBottom: '12px', maxWidth: '500px' }}>
-                รับผิดชอบการปฏิบัติงานด้าน{currentUser.position} และการบริหารจัดการงานใน{formatDept(currentUser.department)}
-              </p>
               <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px', fontSize: '13px', color: '#64748b' }}>
                 <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                  <Mail size={14} style={{ color: '#94a3b8' }} />
-                  {currentUser.id.toLowerCase()}@performance.com
-                </span>
-                <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                   <Building2 size={14} style={{ color: '#94a3b8' }} />
-                  {formatDept(currentUser.department)} (รหัส {currentUser.id})
+                  {formatDept(currentUser.department)}
                 </span>
               </div>
             </div>
@@ -161,6 +154,7 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
                   value={filterYear}
                   onChange={(e) => setFilterYear(e.target.value)}
                 >
+                  <option value="ทั้งหมด">ทุกปี</option>
                   <option value="2026">2026</option>
                   <option value="2025">2025</option>
                 </select>

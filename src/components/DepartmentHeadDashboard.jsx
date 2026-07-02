@@ -17,6 +17,8 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
   const [editingPerf, setEditingPerf] = useState(null);
   const [successToast, setSuccessToast] = useState('');
   const [deleteError, setDeleteError] = useState('');
+  const [filterYear, setFilterYear] = useState('ทั้งหมด');
+  const [filterMonth, setFilterMonth] = useState('ทั้งหมด');
 
   // กรองรายชื่อเจ้าหน้าที่ทั้งหมดในฝ่ายของหัวหน้าฝ่าย
   const deptEmployees = employeesData.filter(e => isSameDept(e.department, currentUser.department));
@@ -49,7 +51,12 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
 
   // ข้อมูลเจ้าหน้าที่ที่เลือกในแท็บตรวจสอบรายบุคคล
   const selectedEmployee = deptEmployees.find(e => e.id === selectedEmpId) || currentUser;
-  const selectedEmpPerformance = (performanceData || []).filter(p => p.employee_id === selectedEmployee.id);
+  const selectedEmpPerformance = (performanceData || []).filter(p => {
+    if (p.employee_id !== selectedEmployee.id) return false;
+    if (filterYear !== 'ทั้งหมด' && String(p.year || '').trim() !== String(filterYear)) return false;
+    if (filterMonth !== 'ทั้งหมด' && String(p.month || '').trim() !== String(filterMonth)) return false;
+    return true;
+  });
   
   const empDone = selectedEmpPerformance.filter(p => p.status === 'Done').length;
   const empProgress = selectedEmpPerformance.filter(p => p.status === 'In Progress').length;
@@ -429,17 +436,10 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
                           {selectedEmployee.position || formatDept(selectedEmployee.department)}
                         </span>
                       </div>
-                      <p style={{ color: '#475569', fontSize: '14px', marginBottom: '12px', maxWidth: '500px' }}>
-                        รับผิดชอบการปฏิบัติงานด้าน{selectedEmployee.position} และการบริหารจัดการงานใน{formatDept(selectedEmployee.department)}
-                      </p>
                       <div style={{ display: 'flex', flexWrap: 'wrap', alignItems: 'center', gap: '16px', fontSize: '13px', color: '#64748b' }}>
                         <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
-                          <Mail size={14} style={{ color: '#94a3b8' }} />
-                          {selectedEmployee.id.toLowerCase()}@performance.com
-                        </span>
-                        <span style={{ display: 'flex', alignItems: 'center', gap: '6px' }}>
                           <Building2 size={14} style={{ color: '#94a3b8' }} />
-                          {formatDept(selectedEmployee.department)} (รหัส {selectedEmployee.id})
+                          {formatDept(selectedEmployee.department)}
                         </span>
                       </div>
                     </div>
@@ -508,7 +508,29 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
                     <Clock size={18} style={{ color: '#6366f1' }} />
                     <span>ประวัติการทำงาน (Performance History)</span>
                   </h3>
-                  <span style={{ fontSize: '13px', color: '#4f46e5', fontWeight: '600', cursor: 'pointer' }}>ดูทั้งหมด</span>
+                  <div style={{ display: 'flex', gap: '8px', alignItems: 'center' }}>
+                    <select
+                      className="form-select"
+                      style={{ padding: '4px 10px', fontSize: '13px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none' }}
+                      value={filterYear}
+                      onChange={(e) => setFilterYear(e.target.value)}
+                    >
+                      <option value="ทั้งหมด">ทุกปี</option>
+                      <option value="2026">2026</option>
+                      <option value="2025">2025</option>
+                    </select>
+                    <select
+                      className="form-select"
+                      style={{ padding: '4px 10px', fontSize: '13px', borderRadius: '6px', border: '1px solid #cbd5e1', outline: 'none' }}
+                      value={filterMonth}
+                      onChange={(e) => setFilterMonth(e.target.value)}
+                    >
+                      <option value="ทั้งหมด">ทุกเดือน</option>
+                      {CONFIG.MONTHS.map(m => (
+                        <option key={m} value={m}>{m}</option>
+                      ))}
+                    </select>
+                  </div>
                 </div>
 
                 <div className="timeline-container">
