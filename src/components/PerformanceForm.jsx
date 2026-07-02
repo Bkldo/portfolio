@@ -110,7 +110,7 @@ export default function PerformanceForm({ currentUser, editingData, onSuccess, o
       <form onSubmit={handleSubmit}>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '16px' }}>
           <div className="form-group">
-            <label className="form-label">ปี (พ.ศ. / ค.ศ.)</label>
+            <label className="form-label">ปี (ค.ศ.)</label>
             <input
               type="number"
               className="form-input"
