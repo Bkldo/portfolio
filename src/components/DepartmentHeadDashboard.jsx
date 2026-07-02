@@ -401,7 +401,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
           {/* ค้นหาและเลือกเจ้าหน้าที่ */}
           <div className="card" style={{ padding: '20px' }}>
             <div style={{ marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '2px' }}>รายชื่อพนักงานในฝ่าย</h3>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '2px' }}>รายชื่อข้าราชการภายในฝ่าย</h3>
               <p style={{ fontSize: '12px', color: '#64748b' }}>สังกัด{formatDept(currentUser.department)} ({filteredDeptEmployees.length} คน)</p>
             </div>
             <div style={{ position: 'relative', marginBottom: '16px' }}>
