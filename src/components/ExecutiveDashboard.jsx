@@ -433,7 +433,7 @@ export default function ExecutiveDashboard({ currentUser, performanceData, emplo
                           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
                             <div>
                               <span className="completion-progress-bar" style={{ width: '80px' }}>
-                                <span className="progress-fill" style={{ width: `${perf.completion_rate}%` }}></span>
+                                <span className="progress-fill" style={{ width: `${perf.completion_rate}%`, backgroundColor: perf.completion_rate == 100 ? '#10b981' : '#3b82f6' }}></span>
                               </span>
                               <span>{perf.completion_rate}%</span>
                             </div>
