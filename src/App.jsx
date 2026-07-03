@@ -6,8 +6,9 @@ import AdminDashboard from './components/AdminDashboard';
 import DepartmentHeadDashboard from './components/DepartmentHeadDashboard';
 import { getInitialData } from './utils/api';
 import { CONFIG, formatDept } from './config';
-import { Briefcase, AlertCircle, FileSpreadsheet, KeyRound, LogOut, ChevronDown } from 'lucide-react';
+import { AlertCircle, FileSpreadsheet, KeyRound, LogOut, ChevronDown } from 'lucide-react';
 import ChangePasswordModal from './components/ChangePasswordModal';
+import FolderIcon from './components/FolderIcon';
 
 export default function App() {
   const [currentUser, setCurrentUser] = useState(() => {
@@ -62,7 +63,7 @@ export default function App() {
           <header className="header-bar">
             <div className="brand-section">
               <div className="brand-icon">
-                <Briefcase size={20} />
+                <FolderIcon size={28} />
               </div>
               <div className="brand-title">
                 <h1 style={{ fontSize: '20px', letterSpacing: '-0.3px', color: '#0f172a' }}>Performance Insights</h1>
