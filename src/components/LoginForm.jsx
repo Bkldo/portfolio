@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { login } from '../utils/api';
-import { LogIn, ShieldAlert } from 'lucide-react';
+import { ShieldAlert } from 'lucide-react';
+import FolderIcon from './FolderIcon';
 
 export default function LoginForm({ onLoginSuccess }) {
   const [citizenId, setCitizenId] = useState('');
@@ -32,7 +33,7 @@ export default function LoginForm({ onLoginSuccess }) {
     <div className="login-wrapper">
       <div className="login-card">
         <div className="login-icon">
-          <LogIn size={32} />
+          <FolderIcon size={56} />
         </div>
         <div className="login-title">
           <h2>เข้าสู่ระบบ Portfolio</h2>
