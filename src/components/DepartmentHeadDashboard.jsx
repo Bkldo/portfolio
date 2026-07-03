@@ -8,6 +8,7 @@ import {
 import { CONFIG, formatDept, isSameDept, calcMonthComparison } from '../config';
 import PerformanceForm from './PerformanceForm';
 import { deletePerformance } from '../utils/api';
+import FolderIcon from './FolderIcon';
 
 export default function DepartmentHeadDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [activeTab, setActiveTab] = useState('overview'); // overview, individual, my_perf
@@ -401,7 +402,7 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
           {/* ค้นหาและเลือกเจ้าหน้าที่ */}
           <div className="card" style={{ padding: '20px' }}>
             <div style={{ marginBottom: '16px' }}>
-              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '2px' }}>รายชื่อข้าราชการภายในฝ่าย</h3>
+              <h3 style={{ fontSize: '16px', fontWeight: '700', color: '#0f172a', marginBottom: '2px' }}>รายชื่อพนักงานในฝ่าย</h3>
               <p style={{ fontSize: '12px', color: '#64748b' }}>สังกัด{formatDept(currentUser.department)} ({filteredDeptEmployees.length} คน)</p>
             </div>
             <div style={{ position: 'relative', marginBottom: '16px' }}>
@@ -664,7 +665,10 @@ export default function DepartmentHeadDashboard({ currentUser, performanceData, 
           {/* รายการผลงานทั้งหมดของหัวหน้าฝ่าย */}
           <div className="card">
             <div className="card-title" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', margin: 0, paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
-              <span>📋 ประวัติรายงานผลงานของฉัน ({myYearPerf.length} รายการ)</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FolderIcon size={24} />
+                <span>ประวัติรายงานผลงานของฉัน ({myYearPerf.length} รายการ)</span>
+              </span>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <select
                   className="form-select"

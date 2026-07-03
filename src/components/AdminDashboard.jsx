@@ -9,6 +9,7 @@ import {
   Edit, Trash2
 } from 'lucide-react';
 import { CONFIG, formatDept, isSameDept } from '../config';
+import FolderIcon from './FolderIcon';
 
 export default function AdminDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [activeTab, setActiveTab] = useState('stats'); // stats, users
@@ -229,7 +230,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
             แผงควบคุมผู้ดูแลระบบ (Admin Dashboard)
           </h2>
           <p style={{ color: 'var(--text-muted)', fontSize: '14px', marginTop: '4px' }}>
-            ดูสถิติผลงานภาพรวม จัดการรายชื่อบุคลากร และลงทะเบียนบุคคลใหม่
+            ดูสถิติผลงานภาพรวมองค์กร จัดการรายชื่อบุคลากร และลงทะเบียนบุคคลใหม่
           </p>
         </div>
         <div style={{ display: 'flex', gap: '10px' }}>
@@ -243,7 +244,7 @@ export default function AdminDashboard({ currentUser, performanceData, employees
       {/* แท็บหลัก */}
       <div className="tabs" style={{ marginBottom: '20px' }}>
         <button className={`tab-btn ${activeTab === 'stats' ? 'active' : ''}`} onClick={() => setActiveTab('stats')}>
-          📊 สถิติผลงาน
+          📊 สถิติผลงานองค์กร
         </button>
         <button className={`tab-btn ${activeTab === 'users' ? 'active' : ''}`} onClick={() => setActiveTab('users')}>
           👥 จัดการบุคลากร
@@ -259,10 +260,10 @@ export default function AdminDashboard({ currentUser, performanceData, employees
           {/* เมนูย่อยสถิติ */}
           <div className="tabs" style={{ marginBottom: '20px' }}>
             <button className={`tab-btn ${statsSubTab === 'overall' ? 'active' : ''}`} onClick={() => setStatsSubTab('overall')}>
-              📊 ภาพรวม
+              📊 ภาพรวมองค์กร
             </button>
             <button className={`tab-btn ${statsSubTab === 'department' ? 'active' : ''}`} onClick={() => setStatsSubTab('department')}>
-              🏢 แยกตามฝ่าย
+              🏢 แยกตามฝ่ายงาน
             </button>
             <button className={`tab-btn ${statsSubTab === 'individual' ? 'active' : ''}`} onClick={() => setStatsSubTab('individual')}>
               👤 ตรวจสอบรายบุคคล
@@ -632,7 +633,10 @@ export default function AdminDashboard({ currentUser, performanceData, employees
           {/* รายการผลงานทั้งหมดของฉัน */}
           <div className="card">
             <div className="card-title" style={{ display: 'flex', flexWrap: 'wrap', justifyContent: 'space-between', alignItems: 'center', margin: 0, paddingBottom: '16px', borderBottom: '1px solid var(--border)' }}>
-              <span>📋 ประวัติรายงานผลงานของฉัน ({myYearPerf.length} รายการ)</span>
+              <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                <FolderIcon size={24} />
+                <span>ประวัติรายงานผลงานของฉัน ({myYearPerf.length} รายการ)</span>
+              </span>
               <div style={{ display: 'flex', gap: '10px' }}>
                 <select
                   className="form-select"

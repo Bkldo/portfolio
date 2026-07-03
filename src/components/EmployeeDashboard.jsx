@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import PerformanceForm from './PerformanceForm';
-import { Award, Briefcase, FileText, CheckCircle2, Clock, AlertTriangle, Link as LinkIcon, Edit, Share2, Mail, Building2, TrendingUp } from 'lucide-react';
+import { Award, FileText, CheckCircle2, Clock, AlertTriangle, Link as LinkIcon, Edit, Share2, Mail, Building2, TrendingUp } from 'lucide-react';
 import { CONFIG, formatDept, calcMonthComparison } from '../config';
+import FolderIcon from './FolderIcon';
 
 export default function EmployeeDashboard({ currentUser, performanceData, employeesData, onRefresh, onLogout }) {
   const [editingPerf, setEditingPerf] = useState(null);
@@ -169,7 +170,7 @@ export default function EmployeeDashboard({ currentUser, performanceData, employ
           <div className="card" style={{ marginBottom: '20px' }}>
             <div className="card-title" style={{ margin: 0, paddingBottom: '16px', borderBottom: '1px solid var(--border)', display: 'flex', flexWrap: 'wrap', gap: '16px' }}>
               <span style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-                <Briefcase size={20} />
+                <FolderIcon size={24} />
                 <span>ประวัติรายงานผลงานของฉัน</span>
               </span>
               
