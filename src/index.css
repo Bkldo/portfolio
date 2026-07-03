@@ -225,16 +225,16 @@ body {
 }
 
 .login-icon {
-  width: 60px;
-  height: 60px;
+  width: 76px;
+  height: 76px;
   background-color: var(--primary-light);
   color: var(--primary);
-  border-radius: var(--radius-lg);
+  border-radius: 20px;
   display: flex;
   align-items: center;
   justify-content: center;
   margin: 0 auto 20px auto;
-  font-size: 30px;
+  box-shadow: 0 4px 12px rgba(79, 70, 229, 0.12);
 }
 
 .login-title h2 {
