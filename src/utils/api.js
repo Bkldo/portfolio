@@ -22,9 +22,13 @@ export const getInitialData = async () => {
       const response = await fetch(`${CONFIG.GOOGLE_SCRIPT_URL}?action=getInitialData`);
       const data = await response.json();
       if (data.status === 'success') {
+        const safeEmployees = (data.employees || []).map(emp => {
+          const { password, ...safeEmp } = emp;
+          return safeEmp;
+        });
         return {
-          employees: data.employees,
-          performance: data.performance
+          employees: safeEmployees,
+          performance: data.performance || []
         };
       }
       throw new Error(data.message || 'เกิดข้อผิดพลาดในการโหลดข้อมูลจาก Google Sheet');
@@ -36,9 +40,14 @@ export const getInitialData = async () => {
 
   // Local Storage Fallback
   initializeLocalStorage();
+  const rawEmployees = JSON.parse(localStorage.getItem(LOCAL_EMPLOYEES_KEY)) || [];
+  const safeEmployees = rawEmployees.map(emp => {
+    const { password, ...safeEmp } = emp;
+    return safeEmp;
+  });
   return {
-    employees: JSON.parse(localStorage.getItem(LOCAL_EMPLOYEES_KEY)),
-    performance: JSON.parse(localStorage.getItem(LOCAL_PERFORMANCE_KEY))
+    employees: safeEmployees,
+    performance: JSON.parse(localStorage.getItem(LOCAL_PERFORMANCE_KEY)) || []
   };
 };
 
