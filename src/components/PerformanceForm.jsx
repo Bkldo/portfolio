@@ -140,7 +140,7 @@ export default function PerformanceForm({ currentUser, editingData, onSuccess, o
           <input
             type="text"
             className="form-input"
-            placeholder="เช่น ออกแบบหน้าจอแดชบอร์ดสรุปผลงาน, แก้ไขบั๊กของระบบหลังบ้าน"
+            placeholder="เช่น จัดทำฎีกาเบิกจ่ายเงิน, จัดทำตัวชี้วัด"
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
